@@ -948,8 +948,7 @@ def _ch_spikes(balls, arena, hazards, rng, config, **kw):
     alive_balls = [b for b in balls if b.alive]
     for _ in range(rng.randint(8, 15)):
         sr = rng.uniform(10, 20)
-        sx = rng.uniform(ax1 + 30, ax2 - 30)
-        sy = rng.uniform(ay1 + 30, ay2 - 30)
+        sx, sy = rng.uniform(ax1 + 30, ax2 - 30), rng.uniform(ay1 + 30, ay2 - 30)
         for _attempt in range(20):
             sx = rng.uniform(ax1 + 30, ax2 - 30)
             sy = rng.uniform(ay1 + 30, ay2 - 30)
@@ -975,8 +974,8 @@ def _ch_lava(balls, arena, hazards, rng, config, **kw):
         for side in sides_to_add:
             hazards.lava_zones.append(LavaZone(
                 side=side,
-                grow_speed=rng.uniform(0.04, 0.12),  # reduced from 0.08-0.25
-                max_thickness=rng.uniform(40, 90),    # reduced from 60-130
+                grow_speed=rng.uniform(0.04, 0.12),
+                max_thickness=rng.uniform(40, 90),
                 warmup_frames=60,
             ))
     else:
@@ -1713,7 +1712,7 @@ class Renderer:
                 # Core beam
                 draw.line([(scx, scy), (ex, ey)],
                           fill=beam_color, width=int(sl.thickness))
-                # Inner white/yellow
+                # Inner core color
                 inner_c = (255, 255, 200) if in_warmup else (255, 200, 200)
                 draw.line([(scx, scy), (ex, ey)],
                           fill=inner_c,
