@@ -427,6 +427,8 @@ class SpinningLaser:
     kill_radius: float = 14.0    # distancia al rayo para morir
     color: Tuple[int, int, int] = (255, 40, 40)
     arms: int = 2                # número de brazos (2 = línea completa)
+    warmup_frames: int = 45      # visible but not lethal for first 45 frames
+    lifetime_frames: int = 900   # removed after this many frames
 
 @dataclass
 class DeathWall:
@@ -436,6 +438,9 @@ class DeathWall:
     speed: float = 0.6          # píxeles/frame
     max_position: float = 250.0
     color: Tuple[int, int, int] = (200, 0, 0)
+    warmup_frames: int = 0       # not lethal during warmup
+    lifetime_frames: int = 600   # countdown to start retreating
+    retreating: bool = False     # is the wall retreating?
 
 @dataclass
 class Shockwave:
@@ -446,7 +451,7 @@ class Shockwave:
     max_radius: float = 350.0
     speed: float = 4.0
     thickness: float = 12.0
-    kill_thickness: float = 18.0  # grosor de la zona letal
+    kill_thickness: float = 12.0  # grosor letal (≤ thickness para coincidir con visual)
     done: bool = False
     color: Tuple[int, int, int] = (255, 255, 100)
 
@@ -459,7 +464,7 @@ class Meteor:
     x: float = 0.0
     speed: float = 6.0
     radius: float = 16.0
-    blast_radius: float = 80.0
+    blast_radius: float = 60.0  # reduced from 80 to 60
     exploded: bool = False
     explosion_frame: int = -1
     warning_shown: bool = True   # mostrar indicador de peligro antes
@@ -471,6 +476,7 @@ class Spike:
     y: float
     radius: float
     pulse_phase: float = 0.0
+    warmup_frames: int = 30      # visible but not lethal for first 30 frames
 
 @dataclass
 class LavaZone:
@@ -478,7 +484,8 @@ class LavaZone:
     side: str
     thickness: float = 0.0
     max_thickness: float = 120.0
-    grow_speed: float = 0.15     # px/frame
+    grow_speed: float = 0.10     # px/frame
+    warmup_frames: int = 60      # not lethal for first 60 frames
 
 @dataclass
 class Vortex:
@@ -489,6 +496,7 @@ class Vortex:
     strength: float = 2.5
     rotation: float = 0.0
     kill_radius: float = 14.0
+    lifetime_frames: int = 900   # removed after this many frames
 
 print("✅ Hazard data classes ready.")
 
@@ -596,14 +604,28 @@ class HazardManager:
 
         self.fireballs = [f for f in self.fireballs if f.lifetime > 0]
 
-        # Spinning lasers: rotan
+        # Spinning lasers: rotan, cuentan warmup y lifetime
         for sl in self.spinning_lasers:
             sl.angle += sl.speed
+            if sl.warmup_frames > 0:
+                sl.warmup_frames -= 1
+            sl.lifetime_frames -= 1
+        self.spinning_lasers = [sl for sl in self.spinning_lasers
+                                 if sl.lifetime_frames > 0]
 
-        # Death walls: avanzan
+        # Death walls: avanzan hasta max_position, luego retroceden y se eliminan
         for dw in self.death_walls:
-            if dw.position < dw.max_position:
+            if dw.warmup_frames > 0:
+                dw.warmup_frames -= 1
+            if dw.retreating:
+                dw.position = max(0.0, dw.position - dw.speed)
+            elif dw.position < dw.max_position:
                 dw.position += dw.speed
+            dw.lifetime_frames -= 1
+            if dw.lifetime_frames <= 0 and not dw.retreating:
+                dw.retreating = True
+        self.death_walls = [dw for dw in self.death_walls
+                            if not dw.retreating or dw.position > 0]
 
         # Shockwaves: se expanden
         for sw in self.shockwaves:
@@ -623,24 +645,36 @@ class HazardManager:
         self.meteors = [m for m in self.meteors
                         if not m.exploded or frame - m.explosion_frame < 30]
 
-        # Spikes: pulsan
+        # Spikes: pulsan, cuentan warmup
         for sp in self.spikes:
             sp.pulse_phase += 0.1
+            if sp.warmup_frames > 0:
+                sp.warmup_frames -= 1
 
-        # Lava: crece gradualmente
+        # Lava: crece gradualmente, cuenta warmup
         for lz in self.lava_zones:
+            if lz.warmup_frames > 0:
+                lz.warmup_frames -= 1
             if lz.thickness < lz.max_thickness:
                 lz.thickness += lz.grow_speed
 
-        # Vortices: rotan
+        # Vortices: rotan, cuentan lifetime
         for v in self.vortices:
             v.rotation += 0.08
+            v.lifetime_frames -= 1
+        self.vortices = [v for v in self.vortices if v.lifetime_frames > 0]
 
-        # Limitar cantidades
+        # Limitar cantidades de todos los tipos de hazards
         if len(self.spikes) > 35:
             self.spikes = self.spikes[-30:]
         if len(self.fireballs) > 8:
             self.fireballs = self.fireballs[-6:]
+        if len(self.spinning_lasers) > 3:
+            self.spinning_lasers = self.spinning_lasers[-3:]
+        if len(self.death_walls) > 4:
+            self.death_walls = self.death_walls[-4:]
+        if len(self.vortices) > 3:
+            self.vortices = self.vortices[-3:]
 
     # ──────────────────────────────────────────────────────────────────────────
     # CHECK COLLISIONS — ¿esta bola debe morir?
@@ -661,6 +695,8 @@ class HazardManager:
 
         # ── Spinning Lasers ──
         for sl in self.spinning_lasers:
+            if sl.warmup_frames > 0:
+                continue
             for arm_i in range(sl.arms):
                 arm_angle = sl.angle + arm_i * (2 * math.pi / sl.arms)
                 ex = sl.cx + math.cos(arm_angle) * sl.length
@@ -671,7 +707,7 @@ class HazardManager:
 
         # ── Death Walls ──
         for dw in self.death_walls:
-            if dw.position <= 0:
+            if dw.warmup_frames > 0 or dw.retreating or dw.position <= 0:
                 continue
             if dw.side == "left" and bx - br < ax1 + dw.position:
                 return True
@@ -685,26 +721,31 @@ class HazardManager:
         # ── Shockwaves ──
         for sw in self.shockwaves:
             dist = math.hypot(bx - sw.cx, by - sw.cy)
-            inner = sw.current_radius - sw.kill_thickness / 2
-            outer = sw.current_radius + sw.kill_thickness / 2
+            kill_th = min(sw.kill_thickness, sw.thickness)  # never wider than visual
+            inner = sw.current_radius - kill_th / 2
+            outer = sw.current_radius + kill_th / 2
             if inner < dist < outer:
                 return True
 
         # ── Meteors (explosión) ──
         for m in self.meteors:
-            if m.exploded and frame - m.explosion_frame < 8:
+            if m.exploded and frame - m.explosion_frame < 4:  # reduced from 8 to 4
                 dist = math.hypot(bx - m.target_x, by - m.target_y)
                 if dist < m.blast_radius:
                     return True
 
         # ── Spikes ──
         for sp in self.spikes:
+            if sp.warmup_frames > 0:
+                continue
             pulse = 1.0 + 0.15 * math.sin(sp.pulse_phase)
             if math.hypot(bx - sp.x, by - sp.y) < sp.radius * pulse + br:
                 return True
 
         # ── Lava Zones ──
         for lz in self.lava_zones:
+            if lz.warmup_frames > 0:
+                continue
             th = lz.thickness
             if th <= 0:
                 continue
@@ -748,6 +789,65 @@ class HazardManager:
 print("✅ Hazard system ready.")
 
 
+# ──────────────────────────────────────────────────────────────────────────────
+# HAZARD SNAPSHOT/RESTORE — guardar y restaurar estado para render correcto
+# ──────────────────────────────────────────────────────────────────────────────
+
+def _snapshot_hazards(hazards: HazardManager) -> Dict:
+    """Serializa el estado visual de todos los hazards en un dict compacto."""
+    return {
+        "fireballs": [(fb.x, fb.y, fb.radius, fb.color, list(fb.trail))
+                      for fb in hazards.fireballs],
+        "spinning_lasers": [(sl.cx, sl.cy, sl.angle, sl.length, sl.thickness,
+                             sl.kill_radius, sl.color, sl.arms, sl.warmup_frames)
+                            for sl in hazards.spinning_lasers],
+        "death_walls": [(dw.side, dw.position, dw.color,
+                         dw.warmup_frames, dw.retreating)
+                        for dw in hazards.death_walls],
+        "shockwaves": [(sw.cx, sw.cy, sw.current_radius, sw.thickness, sw.color)
+                       for sw in hazards.shockwaves],
+        "meteors": [(m.target_x, m.target_y, m.current_y, m.x, m.radius,
+                     m.blast_radius, m.exploded, m.explosion_frame)
+                    for m in hazards.meteors],
+        "spikes": [(sp.x, sp.y, sp.radius, sp.pulse_phase, sp.warmup_frames)
+                   for sp in hazards.spikes],
+        "lava_zones": [(lz.side, lz.thickness, lz.warmup_frames)
+                       for lz in hazards.lava_zones],
+        "vortices": [(v.x, v.y, v.radius, v.rotation, v.kill_radius)
+                     for v in hazards.vortices],
+    }
+
+
+def _restore_hazards(hazards: HazardManager, snap: Dict):
+    """Restaura el estado de los hazards desde un snapshot para render correcto."""
+    hazards.fireballs = [
+        Fireball(x=x, y=y, radius=r, vx=0, vy=0, color=c, trail=list(tr))
+        for x, y, r, c, tr in snap["fireballs"]]
+    hazards.spinning_lasers = [
+        SpinningLaser(cx=cx, cy=cy, angle=a, length=ln, thickness=th,
+                      kill_radius=kr, color=c, arms=arm, warmup_frames=wf)
+        for cx, cy, a, ln, th, kr, c, arm, wf in snap["spinning_lasers"]]
+    hazards.death_walls = [
+        DeathWall(side=s, position=p, color=c, warmup_frames=wf, retreating=ret)
+        for s, p, c, wf, ret in snap["death_walls"]]
+    hazards.shockwaves = [
+        Shockwave(cx=cx, cy=cy, current_radius=cr, thickness=th, color=c)
+        for cx, cy, cr, th, c in snap["shockwaves"]]
+    hazards.meteors = [
+        Meteor(target_x=tx, target_y=ty, current_y=cy_m, x=mx, radius=r,
+               blast_radius=br, exploded=ex, explosion_frame=ef)
+        for tx, ty, cy_m, mx, r, br, ex, ef in snap["meteors"]]
+    hazards.spikes = [
+        Spike(x=x, y=y, radius=r, pulse_phase=pp, warmup_frames=wf)
+        for x, y, r, pp, wf in snap["spikes"]]
+    hazards.lava_zones = [
+        LavaZone(side=s, thickness=th, warmup_frames=wf)
+        for s, th, wf in snap["lava_zones"]]
+    hazards.vortices = [
+        Vortex(x=x, y=y, radius=r, rotation=rot, kill_radius=kr)
+        for x, y, r, rot, kr in snap["vortices"]]
+
+
 # ═══════════════════════════════════════════════════════════════════════════════
 # SECTION 8 — CHALLENGE POOL (cada reto añade hazards VISIBLES)
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -783,16 +883,18 @@ def _ch_fireball(balls, arena, hazards, rng, config, **kw):
 def _ch_spinning_laser(balls, arena, hazards, rng, config, **kw):
     ax1, ay1, ax2, ay2 = arena
     cx, cy = (ax1 + ax2) / 2, (ay1 + ay2) / 2
-    length = min(ax2 - ax1, ay2 - ay1) * 0.48
+    length = min(ax2 - ax1, ay2 - ay1) * 0.30  # reduced from 0.48
     hazards.spinning_lasers.append(SpinningLaser(
         cx=cx + rng.uniform(-30, 30),
         cy=cy + rng.uniform(-30, 30),
         angle=rng.uniform(0, 2 * math.pi),
         length=length,
-        speed=rng.uniform(0.015, 0.04),
+        speed=rng.uniform(0.015, 0.035),
         thickness=rng.uniform(6, 10),
-        kill_radius=rng.uniform(10, 16),
-        arms=rng.choice([2, 3, 4]),
+        kill_radius=rng.uniform(8, 12),
+        arms=rng.choice([1, 2]),  # max 2 arms
+        warmup_frames=45,
+        lifetime_frames=900,
     ))
 
 
@@ -802,22 +904,24 @@ def _ch_death_wall(balls, arena, hazards, rng, config, **kw):
     for side in sides:
         hazards.death_walls.append(DeathWall(
             side=side,
-            speed=rng.uniform(0.3, 0.8),
-            max_position=rng.uniform(80, 180),
+            speed=rng.uniform(0.25, 0.55),
+            max_position=rng.uniform(60, 140),
             color=(rng.randint(180, 255), 0, 0),
+            lifetime_frames=600,
         ))
 
 
 @_register("SHOCKWAVE BLAST", "💥", "shockwave")
 def _ch_shockwave(balls, arena, hazards, rng, config, **kw):
     ax1, ay1, ax2, ay2 = arena
+    thick = rng.uniform(10, 18)
     hazards.shockwaves.append(Shockwave(
         cx=rng.uniform(ax1 + 50, ax2 - 50),
         cy=rng.uniform(ay1 + 50, ay2 - 50),
         speed=rng.uniform(2.5, 5.0),
         max_radius=min(ax2 - ax1, ay2 - ay1) * rng.uniform(0.5, 0.8),
-        thickness=rng.uniform(10, 18),
-        kill_thickness=rng.uniform(14, 24),
+        thickness=thick,
+        kill_thickness=thick,  # equal to visual thickness
         color=(255, 255, rng.randint(50, 200)),
     ))
 
@@ -825,46 +929,63 @@ def _ch_shockwave(balls, arena, hazards, rng, config, **kw):
 @_register("METEOR SHOWER", "☄️", "meteor")
 def _ch_meteor(balls, arena, hazards, rng, config, **kw):
     ax1, ay1, ax2, ay2 = arena
-    for _ in range(rng.randint(5, 10)):
+    for _ in range(rng.randint(4, 8)):
         tx = rng.uniform(ax1 + 30, ax2 - 30)
         ty = rng.uniform(ay1 + 30, ay2 - 30)
         hazards.meteors.append(Meteor(
             target_x=tx, target_y=ty,
             current_y=ay1 - rng.uniform(100, 300),
             x=tx,
-            speed=rng.uniform(4, 8),
-            radius=rng.uniform(10, 18),
-            blast_radius=rng.uniform(50, 100),
+            speed=rng.uniform(4, 7),
+            radius=rng.uniform(10, 16),
+            blast_radius=rng.uniform(30, 60),  # reduced from 50-100
         ))
 
 
 @_register("SPIKE MINEFIELD", "⚠️", "spikes")
 def _ch_spikes(balls, arena, hazards, rng, config, **kw):
     ax1, ay1, ax2, ay2 = arena
-    for _ in range(rng.randint(10, 20)):
+    alive_balls = [b for b in balls if b.alive]
+    for _ in range(rng.randint(8, 15)):
+        sr = rng.uniform(10, 20)
+        sx, sy = rng.uniform(ax1 + 30, ax2 - 30), rng.uniform(ay1 + 30, ay2 - 30)
+        for _attempt in range(20):
+            sx = rng.uniform(ax1 + 30, ax2 - 30)
+            sy = rng.uniform(ay1 + 30, ay2 - 30)
+            if not any(math.hypot(b.x - sx, b.y - sy) < b.radius + sr + 20
+                       for b in alive_balls):
+                break
         hazards.spikes.append(Spike(
-            x=rng.uniform(ax1 + 25, ax2 - 25),
-            y=rng.uniform(ay1 + 25, ay2 - 25),
-            radius=rng.uniform(10, 25),
+            x=sx, y=sy,
+            radius=sr,
             pulse_phase=rng.uniform(0, math.pi * 2),
+            warmup_frames=30,
         ))
 
 
 @_register("LAVA SURGE", "🌋", "lava")
 def _ch_lava(balls, arena, hazards, rng, config, **kw):
     existing_sides = {lz.side for lz in hazards.lava_zones}
-    for side in ["bottom", "left", "right", "top"]:
-        if side not in existing_sides:
+    available_sides = [s for s in ["bottom", "left", "right", "top"]
+                       if s not in existing_sides]
+    if available_sides:
+        sides_to_add = rng.sample(available_sides,
+                                   min(len(available_sides), rng.randint(1, 2)))
+        for side in sides_to_add:
             hazards.lava_zones.append(LavaZone(
                 side=side,
-                grow_speed=rng.uniform(0.08, 0.25),
-                max_thickness=rng.uniform(60, 130),
+                grow_speed=rng.uniform(0.04, 0.12),
+                max_thickness=rng.uniform(40, 90),
+                warmup_frames=60,
             ))
-        else:
-            for lz in hazards.lava_zones:
-                if lz.side == side:
-                    lz.max_thickness += rng.uniform(20, 50)
-                    lz.grow_speed += 0.05
+    else:
+        for lz in hazards.lava_zones:
+            arena_w = arena[2] - arena[0]
+            arena_h = arena[3] - arena[1]
+            lz.max_thickness = min(
+                lz.max_thickness + rng.uniform(10, 25),
+                min(arena_w, arena_h) * 0.25)
+            lz.grow_speed = min(lz.grow_speed + 0.02, 0.12)
 
 
 @_register("BLACK HOLE", "⚫", "vortex")
@@ -873,9 +994,10 @@ def _ch_vortex(balls, arena, hazards, rng, config, **kw):
     hazards.vortices.append(Vortex(
         x=rng.uniform(ax1 + 60, ax2 - 60),
         y=rng.uniform(ay1 + 60, ay2 - 60),
-        radius=rng.uniform(70, 130),
-        strength=rng.uniform(2.0, 4.5),
-        kill_radius=rng.uniform(10, 18),
+        radius=rng.uniform(70, 110),
+        strength=rng.uniform(1.0, 2.5),  # reduced from 2.0-4.5
+        kill_radius=rng.uniform(10, 16),
+        lifetime_frames=900,
     ))
 
 
@@ -892,8 +1014,44 @@ def _ch_teleport(balls, arena, hazards, rng, config, **kw):
     ax1, ay1, ax2, ay2 = arena
     for b in balls:
         if b.alive:
-            b.x = rng.uniform(ax1 + 20, ax2 - 20)
-            b.y = rng.uniform(ay1 + 20, ay2 - 20)
+            nx, ny = b.x, b.y
+            for _attempt in range(25):
+                cx_t = rng.uniform(ax1 + 30, ax2 - 30)
+                cy_t = rng.uniform(ay1 + 30, ay2 - 30)
+                safe = True
+                # Check lava zones
+                for lz in hazards.lava_zones:
+                    if lz.warmup_frames > 0:
+                        continue
+                    th = lz.thickness + b.radius + 15
+                    if lz.side == "bottom" and cy_t + b.radius > ay2 - th:
+                        safe = False; break
+                    if lz.side == "top" and cy_t - b.radius < ay1 + th:
+                        safe = False; break
+                    if lz.side == "left" and cx_t - b.radius < ax1 + th:
+                        safe = False; break
+                    if lz.side == "right" and cx_t + b.radius > ax2 - th:
+                        safe = False; break
+                if not safe:
+                    continue
+                # Check spikes
+                for sp in hazards.spikes:
+                    if sp.warmup_frames > 0:
+                        continue
+                    if math.hypot(cx_t - sp.x, cy_t - sp.y) < sp.radius + b.radius + 10:
+                        safe = False; break
+                if not safe:
+                    continue
+                # Check vortex kill zones
+                for v in hazards.vortices:
+                    if math.hypot(cx_t - v.x, cy_t - v.y) < v.kill_radius + b.radius + 15:
+                        safe = False; break
+                if safe:
+                    nx, ny = cx_t, cy_t
+                    break
+            b.x = nx
+            b.y = ny
+            b.invincible_timer = max(b.invincible_timer, 1.5)  # 1.5s invincibility
 
 
 @_register("SCATTER SHOT", "💫", "scatter")
@@ -951,15 +1109,17 @@ def _ch_combo3(balls, arena, hazards, rng, config, **kw):
         hazards.fireballs.append(Fireball(
             x=(ax1 + ax2) / 2, y=(ay1 + ay2) / 2,
             vx=math.cos(angle) * 5, vy=math.sin(angle) * 5,
-            radius=20, lifetime=20))
-    for _ in range(8):
+            radius=18, lifetime=20))
+    for _ in range(6):
         hazards.spikes.append(Spike(
             rng.uniform(ax1 + 20, ax2 - 20),
             rng.uniform(ay1 + 20, ay2 - 20),
-            rng.uniform(12, 22), 0))
+            rng.uniform(10, 18), 0,
+            warmup_frames=30))
     hazards.death_walls.append(DeathWall(
         side=rng.choice(["left", "right", "top", "bottom"]),
-        speed=0.5, max_position=120))
+        speed=0.4, max_position=100,
+        lifetime_frames=600))
 
 
 @_register("INVINCIBILITY ROULETTE", "🛡️", "invincible")
@@ -1008,9 +1168,10 @@ def _ch_tornado(balls, arena, hazards, rng, config, **kw):
     hazards.vortices.append(Vortex(
         x=rng.uniform(ax1 + 60, ax2 - 60),
         y=rng.uniform(ay1 + 60, ay2 - 60),
-        radius=rng.uniform(90, 150),
-        strength=rng.uniform(3.0, 5.5),
-        kill_radius=rng.uniform(12, 20),
+        radius=rng.uniform(90, 130),
+        strength=rng.uniform(1.5, 3.0),  # reduced from 3.0-5.5
+        kill_radius=rng.uniform(10, 16),
+        lifetime_frames=600,
     ))
     for b in balls:
         if b.alive:
@@ -1027,7 +1188,7 @@ def _ch_thanos(balls, arena, hazards, rng, config, **kw):
     hazards.shockwaves.append(Shockwave(
         cx=cx, cy=cy, speed=6.0,
                 max_radius=max(ax2 - ax1, ay2 - ay1) * 0.7,
-        thickness=20, kill_thickness=30,
+        thickness=20, kill_thickness=20,  # equal, not 30
         color=(200, 100, 255),
     ))
 
@@ -1040,8 +1201,9 @@ print(f"✅ {len(ALL_CHALLENGES)} challenges registered.")
 # ═══════════════════════════════════════════════════════════════════════════════
 
 class PhysicsEngine:
-    def __init__(self, config: Config):
+    def __init__(self, config: Config, rng: random.Random = None):
         self.config = config
+        self.rng = rng if rng is not None else random.Random()
 
     def get_arena(self, t: float) -> Tuple[int, int, int, int]:
         progress = min(1.0, t / self.config.duration)
@@ -1080,9 +1242,9 @@ class PhysicsEngine:
             ball.x += ball.vx
             ball.y += ball.vy
 
-            # Tiny random perturbation
-            ball.vx += random.gauss(0, 0.06)
-            ball.vy += random.gauss(0, 0.06)
+            # Tiny random perturbation (using seeded rng for reproducibility)
+            ball.vx += self.rng.gauss(0, 0.06)
+            ball.vy += self.rng.gauss(0, 0.06)
 
             # Speed cap
             speed = math.hypot(ball.vx, ball.vy)
@@ -1421,11 +1583,20 @@ class Renderer:
                 continue
             th = int(lz.thickness)
             flicker = int(random.uniform(-8, 8))
-            lava_colors = [
-                (255, 60 + flicker, 0),
-                (255, 120 + flicker, 0),
-                (255, 180, 50),
-            ]
+            in_warmup = lz.warmup_frames > 0
+            if in_warmup:
+                # During warmup: show as dark orange/yellow warning, not lethal
+                lava_colors = [
+                    (200, 100 + flicker, 0),
+                    (220, 160 + flicker, 0),
+                    (240, 200, 30),
+                ]
+            else:
+                lava_colors = [
+                    (255, 60 + flicker, 0),
+                    (255, 120 + flicker, 0),
+                    (255, 180, 50),
+                ]
             if lz.side == "bottom":
                 for row in range(min(th, ay2 - ay1)):
                     yl = ay2 - th + row
@@ -1482,6 +1653,7 @@ class Renderer:
             pulse = 1.0 + 0.15 * math.sin(sp.pulse_phase)
             sr_s = int(sp.radius * pulse)
             sx, sy = int(sp.x), int(sp.y)
+            in_warmup = sp.warmup_frames > 0
             points = []
             num_pts = 8
             for ip in range(num_pts * 2):
@@ -1490,11 +1662,13 @@ class Renderer:
                 points.append((sx + int(math.cos(a) * r_s),
                                 sy + int(math.sin(a) * r_s)))
             if len(points) >= 3:
-                draw.polygon(points, fill=(200, 200, 200),
-                             outline=(255, 80, 80), width=2)
+                fill_c = (150, 150, 200) if in_warmup else (200, 200, 200)
+                outline_c = (255, 220, 0) if in_warmup else (255, 80, 80)
+                draw.polygon(points, fill=fill_c,
+                             outline=outline_c, width=2)
             draw.ellipse([sx - sr_s - 3, sy - sr_s - 3,
                           sx + sr_s + 3, sy + sr_s + 3],
-                         outline=(255, 50, 50), width=1)
+                         outline=(255, 220, 0) if in_warmup else (255, 50, 50), width=1)
 
         # ── Fireballs (bola de fuego que rebota) ──
         for fb in hazards.fireballs:
@@ -1525,23 +1699,28 @@ class Renderer:
         # ── Spinning Lasers ──
         for sl in hazards.spinning_lasers:
             scx, scy = int(sl.cx), int(sl.cy)
+            in_warmup = sl.warmup_frames > 0
+            beam_color = (255, 200, 0) if in_warmup else sl.color
+            glow_color = (200, 150, 0) if in_warmup else (255, 50, 50)
             for arm_i in range(sl.arms):
                 arm_angle = sl.angle + arm_i * (2 * math.pi / sl.arms)
                 ex = int(sl.cx + math.cos(arm_angle) * sl.length)
                 ey = int(sl.cy + math.sin(arm_angle) * sl.length)
                 # Outer glow
                 draw.line([(scx, scy), (ex, ey)],
-                          fill=(255, 50, 50), width=int(sl.thickness + 8))
+                          fill=glow_color, width=int(sl.thickness + 8))
                 # Core beam
                 draw.line([(scx, scy), (ex, ey)],
-                          fill=sl.color, width=int(sl.thickness))
-                # Inner white
+                          fill=beam_color, width=int(sl.thickness))
+                # Inner core color
+                inner_c = (255, 255, 200) if in_warmup else (255, 200, 200)
                 draw.line([(scx, scy), (ex, ey)],
-                          fill=(255, 200, 200),
+                          fill=inner_c,
                           width=max(1, int(sl.thickness // 3)))
             # Center hub
             draw.ellipse([scx - 10, scy - 10, scx + 10, scy + 10],
-                         fill=(255, 100, 100), outline=(255, 255, 255), width=2)
+                         fill=(255, 200, 100) if in_warmup else (255, 100, 100),
+                         outline=(255, 255, 255), width=2)
             cf = self._font(14)
             draw.text((scx - 5, scy - 7), "⚡", font=cf)
 
@@ -1651,10 +1830,12 @@ class Renderer:
                     x2_v = vx + int(math.cos(a2) * ring)
                     y2_v = vy + int(math.sin(a2) * ring)
                     draw.line([(x1_v, y1_v), (x2_v, y2_v)], fill=c_v, width=2)
-            # Kill zone center
+            # Kill zone center — made more visible with larger red circle
             kr = int(v.kill_radius)
+            draw.ellipse([vx - kr - 4, vy - kr - 4, vx + kr + 4, vy + kr + 4],
+                         fill=(180, 0, 0), outline=(255, 50, 50), width=3)
             draw.ellipse([vx - kr, vy - kr, vx + kr, vy + kr],
-                         fill=(50, 0, 100), outline=(200, 50, 255), width=2)
+                         fill=(255, 0, 0), outline=(255, 180, 0), width=2)
             # Label
             vf = self._font(14)
             draw.text((vx - 5, vy - 7), "⚫", font=vf)
@@ -2385,7 +2566,7 @@ class BallBattleRoyale:
         print(f"\n🔵 Creating {config.num_balls} brainrot balls...")
         colors = generate_vibrant_colors(config.num_balls, self.rng)
 
-        physics = PhysicsEngine(config)
+        physics = PhysicsEngine(config, self.rng)
         arena_init = physics.get_arena(countdown_dur)
         ax1, ay1, ax2, ay2 = arena_init
 
@@ -2496,21 +2677,15 @@ class BallBattleRoyale:
                         radius=20, lifetime=15))
                     forced_kill_timer = 0
 
-                # Hard pacing: only if >80% through and >20 alive
-                if race_progress > 0.8 and alive_now > 20 and forced_kill_timer > fps * 5:
-                    candidates = sorted(
-                        [b for b in balls if b.alive],
-                        key=lambda b: self._danger_score(b, arena, hazards),
-                        reverse=True)
-                    if len(candidates) > 1:
-                        victim = candidates[0]
-                        victim.alive = False
-                        victim.death_frame = frame
-                        renderer.add_death_particles(victim.x, victim.y, victim.color, frame)
-                        renderer.add_bubble_explosion(victim.x, victim.y, victim.color, frame)
-                        renderer.add_elimination(frame, victim.name, victim.color)
-                        death_times.append(t)
-                        forced_kill_timer = 0
+                # Hard pacing: only if >90% through and >40 alive; use fireball not direct kill
+                if race_progress > 0.9 and alive_now > 40 and forced_kill_timer > fps * 5:
+                    ax1_h, ay1_h, ax2_h, ay2_h = arena
+                    angle_h = self.rng.uniform(0, 2 * math.pi)
+                    hazards.fireballs.append(Fireball(
+                        x=(ax1_h + ax2_h) / 2, y=(ay1_h + ay2_h) / 2,
+                        vx=math.cos(angle_h) * 5, vy=math.sin(angle_h) * 5,
+                        radius=22, lifetime=15))
+                    forced_kill_timer = 0
 
                 # ── Check winner ──
                 alive_now = sum(1 for b in balls if b.alive)
@@ -2536,6 +2711,7 @@ class BallBattleRoyale:
                 "arena": arena, "alive_count": alive_count,
                 "challenge_index": current_challenge_index,
                 "ball_states": [],
+                "hazard_state": _snapshot_hazards(hazards),
             }
             for b in balls:
                 snapshot["ball_states"].append({
@@ -2597,6 +2773,8 @@ class BallBattleRoyale:
                 balls[i_b].trail = bs["trail"]
                 balls[i_b].invincible_timer = bs["invincible_timer"]
                 balls[i_b].radius = bs["radius"]
+
+            _restore_hazards(hazards, snap["hazard_state"])
 
             rendered = renderer.render_frame(
                 snap["t"], snap["frame"], balls,
