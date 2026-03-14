@@ -1,0 +1,2786 @@
+# ============================================================================
+# 🔴 100 BALLS BATTLE ROYALE — BRAINROT EDITION (MEGA REMASTERED)
+# ============================================================================
+# 100 bolas con personajes brainrot compiten en una arena que se encoge.
+# Hazards VISIBLES que destruyen: bolas de fuego, rayos giratorios,
+# ondas expansivas, zonas de muerte, meteoros, etc.
+# Imágenes reales de personajes brainrot descargadas de internet.
+# Duración larga (~90 s). Pacing natural. 100 % aleatorio.
+#
+# ➜ Pega en UNA celda de Google Colab y ejecuta.
+# ============================================================================
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 0 — INSTALL DEPENDENCIES
+# ═══════════════════════════════════════════════════════════════════════════════
+import subprocess, sys
+
+_PACKAGES = ["moviepy", "Pillow", "numpy", "gTTS", "pydub", "requests"]
+for _pkg in _PACKAGES:
+    subprocess.check_call(
+        [sys.executable, "-m", "pip", "install", "-q", _pkg],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+print("✅ Dependencies installed.")
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 1 — IMPORTS
+# ═══════════════════════════════════════════════════════════════════════════════
+import os, io, math, time, random, colorsys, gc, glob, traceback, hashlib
+import wave as wave_mod
+import requests
+from dataclasses import dataclass, field
+from typing import List, Dict, Tuple, Optional, Any, Callable, Set
+from pathlib import Path
+from copy import deepcopy
+from urllib.parse import quote
+
+import numpy as np
+from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageOps
+from moviepy.editor import VideoClip, AudioFileClip
+from moviepy.audio.AudioClip import AudioClip
+from gtts import gTTS
+from pydub import AudioSegment
+
+print("✅ All imports loaded.")
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 2 — BRAINROT CHARACTERS DATABASE (ACTUALIZADO 2025-2026)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+BRAINROT_CHARACTERS: List[Dict[str, Any]] = [
+    # ── Italian Brainrot (viral 2025-2026) ──
+    {"name": "Tralalero Tralala",     "emoji": "🦈", "hue": 0.58, "symbol": "Tr",
+     "img_query": "tralalero+tralala+shark+meme"},
+    {"name": "Bombardino Crocodilo",  "emoji": "🐊", "hue": 0.35, "symbol": "Bo",
+     "img_query": "bombardino+crocodilo+meme"},
+    {"name": "Tung Tung Sahur",       "emoji": "🥁", "hue": 0.07, "symbol": "TT",
+     "img_query": "tung+tung+tung+sahur+meme"},
+    {"name": "Ballerina Cappuccina",  "emoji": "☕", "hue": 0.08, "symbol": "BC",
+     "img_query": "ballerina+cappuccina+meme"},
+    {"name": "Lirili Larila",         "emoji": "🌵", "hue": 0.33, "symbol": "LL",
+     "img_query": "lirili+larila+cactus+elephant+meme"},
+    {"name": "Brr Brr Patapim",       "emoji": "🥶", "hue": 0.55, "symbol": "BP",
+     "img_query": "brr+brr+patapim+meme"},
+    {"name": "Chimpanzini Bananini",  "emoji": "🍌", "hue": 0.15, "symbol": "CB",
+     "img_query": "chimpanzini+bananini+meme"},
+    {"name": "Boneca Ambalabu",       "emoji": "🐸", "hue": 0.33, "symbol": "BA",
+     "img_query": "boneca+ambalabu+meme"},
+    {"name": "Capuccino Assassino",   "emoji": "☠️", "hue": 0.07, "symbol": "CA",
+     "img_query": "capuccino+assassino+meme"},
+    {"name": "Frigo Camelo",          "emoji": "🐫", "hue": 0.55, "symbol": "FC",
+     "img_query": "frigo+camelo+meme"},
+    {"name": "Trippi Troppi",         "emoji": "🍄", "hue": 0.80, "symbol": "TrT",
+     "img_query": "trippi+troppi+mushroom+brainrot"},
+    {"name": "La Vaca Saturno",       "emoji": "🐄", "hue": 0.70, "symbol": "VS",
+     "img_query": "la+vaca+saturno+saturnita+meme"},
+    {"name": "Glorbo",                "emoji": "👾", "hue": 0.45, "symbol": "Gl",
+     "img_query": "glorbo+brainrot+meme"},
+    {"name": "Bombombini Gusini",     "emoji": "🪿", "hue": 0.15, "symbol": "BG",
+     "img_query": "bombombini+gusini+meme"},
+    {"name": "Cocofanto",             "emoji": "🥥", "hue": 0.10, "symbol": "Co",
+     "img_query": "cocofanto+brainrot+meme"},
+    # ── Skibidi / Classic Brainrot ──
+    {"name": "Skibidi Toilet",        "emoji": "🚽", "hue": 0.55, "symbol": "ST",
+     "img_query": "skibidi+toilet+meme"},
+    {"name": "Cameraman",             "emoji": "📷", "hue": 0.10, "symbol": "Cm",
+     "img_query": "skibidi+cameraman+meme"},
+    {"name": "Speakerman",            "emoji": "🔊", "hue": 0.60, "symbol": "Sp",
+     "img_query": "skibidi+speakerman+meme"},
+    {"name": "TV Man",                "emoji": "📺", "hue": 0.75, "symbol": "TV",
+     "img_query": "skibidi+tv+man+meme"},
+    {"name": "Titan Cameraman",       "emoji": "🤖", "hue": 0.55, "symbol": "Ti",
+     "img_query": "titan+cameraman+skibidi"},
+    {"name": "Plungerman",            "emoji": "🪠", "hue": 0.05, "symbol": "Pl",
+     "img_query": "plungerman+skibidi+meme"},
+    # ── Sigma / Rizz / Streamer Brainrot ──
+    {"name": "Sigma Boy",             "emoji": "🐺", "hue": 0.00, "symbol": "σ",
+     "img_query": "sigma+boy+meme"},
+    {"name": "Rizz God",              "emoji": "😎", "hue": 0.08, "symbol": "Rz",
+     "img_query": "rizz+god+meme"},
+    {"name": "Rizzler",               "emoji": "💋", "hue": 0.90, "symbol": "Ri",
+     "img_query": "the+rizzler+baby+meme"},
+    {"name": "Giga Chad",             "emoji": "💪", "hue": 0.00, "symbol": "GC",
+     "img_query": "gigachad+meme"},
+    {"name": "John Pork",             "emoji": "🐷", "hue": 0.95, "symbol": "JP",
+     "img_query": "john+pork+calling+meme"},
+    {"name": "Grimace Shake",         "emoji": "🟣", "hue": 0.78, "symbol": "GS",
+     "img_query": "grimace+shake+meme"},
+    {"name": "Smurf Cat",             "emoji": "🐱", "hue": 0.58, "symbol": "SC",
+     "img_query": "smurf+cat+meme+blue"},
+    {"name": "Ohio Boss",             "emoji": "💀", "hue": 0.00, "symbol": "OH",
+     "img_query": "only+in+ohio+boss+meme"},
+    {"name": "Gyatt King",            "emoji": "👑", "hue": 0.12, "symbol": "GK",
+     "img_query": "gyatt+meme+king"},
+    {"name": "Hawk Tuah",             "emoji": "🦅", "hue": 0.07, "symbol": "HT",
+     "img_query": "hawk+tuah+girl+meme"},
+    {"name": "Kai Cenat",             "emoji": "🎤", "hue": 0.70, "symbol": "KC",
+     "img_query": "kai+cenat+meme"},
+    {"name": "Speed",                 "emoji": "⚡", "hue": 0.12, "symbol": "IS",
+     "img_query": "ishowspeed+meme+face"},
+    {"name": "Caseoh",                "emoji": "🍔", "hue": 0.06, "symbol": "Ca",
+     "img_query": "caseoh+meme"},
+    {"name": "Fanum Tax",             "emoji": "💰", "hue": 0.14, "symbol": "FT",
+     "img_query": "fanum+tax+meme"},
+    {"name": "Duke Dennis",           "emoji": "🎮", "hue": 0.28, "symbol": "DD",
+     "img_query": "duke+dennis+meme"},
+    {"name": "Baby Gronk",            "emoji": "🏈", "hue": 0.08, "symbol": "BaG",
+     "img_query": "baby+gronk+meme"},
+    # ── Classic Internet / Gaming Brainrot ──
+    {"name": "Quandale Dingle",       "emoji": "😂", "hue": 0.30, "symbol": "QD",
+     "img_query": "quandale+dingle+face+meme"},
+    {"name": "Amogus",                "emoji": "📮", "hue": 0.00, "symbol": "SU",
+     "img_query": "amogus+sus+meme"},
+    {"name": "Freddy Fazbear",        "emoji": "🐻", "hue": 0.07, "symbol": "FF",
+     "img_query": "freddy+fazbear+meme"},
+    {"name": "Doge",                  "emoji": "🐕", "hue": 0.12, "symbol": "Do",
+     "img_query": "doge+shiba+meme"},
+    {"name": "Pepe",                  "emoji": "🐸", "hue": 0.33, "symbol": "Pe",
+     "img_query": "pepe+frog+meme"},
+    {"name": "Nyan Cat",              "emoji": "🌈", "hue": 0.80, "symbol": "NC",
+     "img_query": "nyan+cat+meme"},
+    {"name": "Big Chungus",           "emoji": "🐰", "hue": 0.45, "symbol": "BC2",
+     "img_query": "big+chungus+meme"},
+    {"name": "Ugandan Knuckles",      "emoji": "👊", "hue": 0.00, "symbol": "UK",
+     "img_query": "ugandan+knuckles+meme"},
+    {"name": "Sans Undertale",        "emoji": "💀", "hue": 0.60, "symbol": "Sa",
+     "img_query": "sans+undertale+meme"},
+    {"name": "Sonic",                 "emoji": "🔵", "hue": 0.58, "symbol": "So",
+     "img_query": "sonic+meme+face"},
+    {"name": "Creeper",               "emoji": "💚", "hue": 0.33, "symbol": "Cr",
+     "img_query": "creeper+minecraft+meme"},
+    {"name": "Steve MC",              "emoji": "⛏️", "hue": 0.55, "symbol": "SM",
+     "img_query": "steve+minecraft+face+meme"},
+    {"name": "Drip Goku",             "emoji": "🐲", "hue": 0.58, "symbol": "DG",
+     "img_query": "drip+goku+meme"},
+    {"name": "Shrek",                 "emoji": "🟢", "hue": 0.33, "symbol": "Sh",
+     "img_query": "shrek+face+meme"},
+    {"name": "Spongebob",             "emoji": "🧽", "hue": 0.15, "symbol": "SB",
+     "img_query": "spongebob+mocking+meme"},
+    {"name": "Walter White",          "emoji": "🧪", "hue": 0.40, "symbol": "WW",
+     "img_query": "walter+white+heisenberg+meme"},
+    {"name": "Rick Astley",           "emoji": "🎶", "hue": 0.00, "symbol": "RA",
+     "img_query": "rick+astley+rickroll+meme"},
+    {"name": "Mr Beast",              "emoji": "🎁", "hue": 0.55, "symbol": "MrB",
+     "img_query": "mrbeast+meme+face"},
+    {"name": "Hasbulla",              "emoji": "👶", "hue": 0.08, "symbol": "Ha",
+     "img_query": "hasbulla+meme+face"},
+    {"name": "Toothless Dance",       "emoji": "🐉", "hue": 0.70, "symbol": "TL",
+     "img_query": "toothless+dance+meme"},
+    {"name": "Pingu",                 "emoji": "🐧", "hue": 0.55, "symbol": "Pg",
+     "img_query": "pingu+noot+noot+meme"},
+    {"name": "Goofy Ahh",             "emoji": "🤡", "hue": 0.02, "symbol": "GA",
+     "img_query": "goofy+ahh+meme"},
+    {"name": "Peter Griffin",         "emoji": "🍺", "hue": 0.55, "symbol": "PG",
+     "img_query": "peter+griffin+meme+face"},
+    {"name": "Morbius",               "emoji": "🧛", "hue": 0.78, "symbol": "MB",
+     "img_query": "morbius+morbin+time+meme"},
+    {"name": "Thanos",                "emoji": "🟣", "hue": 0.78, "symbol": "Th",
+     "img_query": "thanos+snap+meme"},
+    {"name": "Dababy",                "emoji": "👉", "hue": 0.55, "symbol": "DB",
+     "img_query": "dababy+lets+go+meme"},
+    {"name": "Stonks",                "emoji": "📈", "hue": 0.33, "symbol": "St",
+     "img_query": "stonks+meme+man"},
+    {"name": "Bingus",                "emoji": "🐱", "hue": 0.95, "symbol": "Bi",
+     "img_query": "bingus+cat+meme"},
+    {"name": "Floppa",                "emoji": "🐈", "hue": 0.08, "symbol": "Fl",
+     "img_query": "floppa+big+floppa+meme"},
+    {"name": "Juan Horse",            "emoji": "🐴", "hue": 0.07, "symbol": "Ju",
+     "img_query": "juan+horse+balcony+meme"},
+    {"name": "NPC Man",               "emoji": "🧍", "hue": 0.45, "symbol": "NP",
+     "img_query": "npc+meme+man"},
+    {"name": "Mewing Master",         "emoji": "🤫", "hue": 0.55, "symbol": "MW",
+     "img_query": "mewing+meme"},
+    {"name": "Pibby",                 "emoji": "📡", "hue": 0.62, "symbol": "Pi",
+     "img_query": "pibby+glitch+meme"},
+    {"name": "Waluigi",               "emoji": "🟣", "hue": 0.75, "symbol": "Wa",
+     "img_query": "waluigi+meme"},
+    {"name": "Luigi Death Stare",     "emoji": "🟢", "hue": 0.35, "symbol": "Lu",
+     "img_query": "luigi+death+stare+meme"},
+    {"name": "Enderman",              "emoji": "🟪", "hue": 0.78, "symbol": "En",
+     "img_query": "enderman+minecraft+meme"},
+    {"name": "Patrick Star",          "emoji": "⭐", "hue": 0.95, "symbol": "PS",
+     "img_query": "patrick+star+meme"},
+    {"name": "Vibe Check",            "emoji": "✅", "hue": 0.33, "symbol": "VC",
+     "img_query": "vibe+check+meme"},
+    {"name": "Skill Issue",           "emoji": "📛", "hue": 0.00, "symbol": "SI",
+     "img_query": "skill+issue+meme"},
+    {"name": "Caught in 4K",          "emoji": "📸", "hue": 0.55, "symbol": "4K",
+     "img_query": "caught+in+4k+meme"},
+    {"name": "Sus Baka",              "emoji": "🔺", "hue": 0.00, "symbol": "SBa",
+     "img_query": "sus+baka+meme"},
+    {"name": "Edging Expert",         "emoji": "🏔️", "hue": 0.55, "symbol": "EE",
+     "img_query": "edging+meme+brainrot"},
+    {"name": "Ratio King",            "emoji": "📊", "hue": 0.60, "symbol": "RK",
+     "img_query": "ratio+meme+twitter"},
+    {"name": "W Holder",              "emoji": "🏆", "hue": 0.14, "symbol": "WH",
+     "img_query": "w+meme+holding"},
+    {"name": "Cope Lord",             "emoji": "😤", "hue": 0.02, "symbol": "CL",
+     "img_query": "cope+seethe+meme"},
+    {"name": "Blud",                  "emoji": "🩸", "hue": 0.00, "symbol": "Bl",
+     "img_query": "blud+meme+skull"},
+    {"name": "Bruh Moment",           "emoji": "😐", "hue": 0.45, "symbol": "BM",
+     "img_query": "bruh+moment+meme"},
+    {"name": "Based King",            "emoji": "👑", "hue": 0.12, "symbol": "BK",
+     "img_query": "based+chad+meme"},
+    {"name": "Touch Grass",           "emoji": "🌿", "hue": 0.33, "symbol": "TG",
+     "img_query": "touch+grass+meme"},
+    {"name": "Yeet Champion",         "emoji": "🎯", "hue": 0.55, "symbol": "YC",
+     "img_query": "yeet+meme"},
+    {"name": "Main Character",        "emoji": "🎬", "hue": 0.70, "symbol": "MC",
+     "img_query": "main+character+energy+meme"},
+    {"name": "Plot Armor",            "emoji": "🛡️", "hue": 0.55, "symbol": "PA",
+     "img_query": "plot+armor+meme+anime"},
+    {"name": "Did You Pray",          "emoji": "🙏", "hue": 0.45, "symbol": "DP",
+     "img_query": "did+you+pray+today+meme"},
+    {"name": "Ayo?!",                 "emoji": "😳", "hue": 0.08, "symbol": "AY",
+     "img_query": "ayo+sus+meme"},
+    {"name": "It's Corn",             "emoji": "🌽", "hue": 0.15, "symbol": "IC",
+     "img_query": "its+corn+kid+meme"},
+    {"name": "Glizzy Gobbler",        "emoji": "🌭", "hue": 0.10, "symbol": "GG",
+     "img_query": "glizzy+gobbler+meme"},
+    {"name": "Dream",                 "emoji": "🎭", "hue": 0.33, "symbol": "Dr",
+     "img_query": "dream+smp+smile+meme"},
+    {"name": "Baby Shark",            "emoji": "🦈", "hue": 0.55, "symbol": "BS",
+     "img_query": "baby+shark+meme"},
+    {"name": "Shadow",                "emoji": "🖤", "hue": 0.00, "symbol": "Shd",
+     "img_query": "shadow+hedgehog+meme"},
+    {"name": "Ankha Zone",            "emoji": "🐈", "hue": 0.12, "symbol": "AZ",
+     "img_query": "ankha+zone+meme"},
+    {"name": "Jellybean",             "emoji": "🫘", "hue": 0.85, "symbol": "JB",
+     "img_query": "jellybean+youtuber+meme"},
+    {"name": "No Cap",                "emoji": "🚫", "hue": 0.55, "symbol": "NCp",
+     "img_query": "no+cap+meme"},
+    {"name": "Bussin Boy",            "emoji": "🍗", "hue": 0.10, "symbol": "BB",
+     "img_query": "bussin+meme+food"},
+    {"name": "Livvy Dunne",           "emoji": "🤸", "hue": 0.90, "symbol": "LD",
+     "img_query": "livvy+dunne+meme"},
+    {"name": "Gigachad Jr",           "emoji": "🦸", "hue": 0.00, "symbol": "GJ",
+     "img_query": "gigachad+junior+meme"},
+    {"name": "Tim Cheese",            "emoji": "🐭", "hue": 0.15, "symbol": "TC",
+     "img_query": "tim+cheese+meme+brainrot"},
+]
+
+print(f"✅ {len(BRAINROT_CHARACTERS)} brainrot characters loaded.")
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 3 — IMAGE DOWNLOADER (descarga imágenes reales de los personajes)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def download_character_images(characters: List[Dict], cache_dir: str,
+                              icon_size: int = 64) -> Dict[str, Image.Image]:
+    """Intenta descargar un avatar para cada personaje desde DuckDuckGo o
+    genera un icono fallback con su emoji/símbolo."""
+    os.makedirs(cache_dir, exist_ok=True)
+    images: Dict[str, Image.Image] = {}
+
+    print("🖼️ Descargando imágenes de personajes...")
+    for i, char in enumerate(characters):
+        name = char["name"]
+        cache_path = os.path.join(cache_dir,
+                                   f"{hashlib.md5(name.encode()).hexdigest()}.png")
+
+        # Si ya la tenemos cacheada, cargarla
+        if os.path.exists(cache_path):
+            try:
+                img = Image.open(cache_path).convert("RGBA")
+                img = img.resize((icon_size, icon_size), Image.LANCZOS)
+                images[name] = img
+                continue
+            except Exception:
+                pass
+
+        # Intentar descargar
+        downloaded = False
+        query = char.get("img_query", name.replace(" ", "+"))
+
+        # Método: usar un servicio de placeholder con el nombre
+        # (robohash genera avatares únicos por texto)
+        try:
+            url = f"https://robohash.org/{quote(name)}?size={icon_size}x{icon_size}&set=set4"
+            resp = requests.get(url, timeout=5)
+            if resp.status_code == 200 and len(resp.content) > 500:
+                img = Image.open(io.BytesIO(resp.content)).convert("RGBA")
+                img = img.resize((icon_size, icon_size), Image.LANCZOS)
+                img.save(cache_path)
+                images[name] = img
+                downloaded = True
+        except Exception:
+            pass
+
+        if not downloaded:
+            # Fallback: generar icono con símbolo
+            images[name] = _generate_fallback_icon(char, icon_size)
+
+        if (i + 1) % 20 == 0:
+            print(f"   {i + 1}/{len(characters)} procesados...")
+
+    print(f"✅ {len(images)} imágenes de personajes listas.")
+    return images
+
+
+def _generate_fallback_icon(char: Dict, size: int) -> Image.Image:
+    """Genera un icono circular con el símbolo del personaje."""
+    hue = char.get("hue", random.random())
+    r, g, b = [int(c * 255) for c in colorsys.hsv_to_rgb(hue, 0.8, 0.9)]
+    img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    # Círculo de fondo
+    draw.ellipse([2, 2, size - 3, size - 3], fill=(r, g, b, 230))
+    draw.ellipse([2, 2, size - 3, size - 3], outline=(255, 255, 255, 200), width=2)
+    # Símbolo centrado
+    font_size = max(8, size // 3)
+    font = ImageFont.load_default()
+    for path in [
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+        "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
+    ]:
+        if os.path.exists(path):
+            try:
+                font = ImageFont.truetype(path, font_size)
+                break
+            except Exception:
+                continue
+    text = char.get("symbol", "?")
+    bbox = draw.textbbox((0, 0), text, font=font)
+    tw, th = bbox[2] - bbox[0], bbox[3] - bbox[1]
+    draw.text(((size - tw) // 2, (size - th) // 2 - 1), text,
+              font=font, fill=(255, 255, 255, 255))
+    return img
+
+
+print("✅ Image downloader ready.")
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 4 — CONFIGURATION
+# ═══════════════════════════════════════════════════════════════════════════════
+
+@dataclass
+class Config:
+    width: int = 720
+    height: int = 1280
+    fps: int = 30
+    duration: float = 90.0
+    bitrate: str = "6000k"
+    arena_margin_start: int = 40
+    arena_margin_end: int = 280
+    arena_color: Tuple[int, int, int] = (15, 12, 30)
+    arena_border_color: Tuple[int, int, int] = (255, 255, 255)
+    arena_border_width: int = 4
+    num_balls: int = 100
+    ball_radius: int = 14
+    ball_speed_min: float = 1.2
+    ball_speed_max: float = 3.0
+    ball_outline_width: int = 2
+    # ── Hazard / challenge config ──
+    challenge_interval: float = 8.0       # segundos entre retos
+    challenges_per_game: int = 7
+    # ── Physics ──
+    gravity: float = 0.0
+    bounce_damping: float = 0.95
+    ball_ball_push: float = 0.7
+    # ── Audio ──
+    audio_enabled: bool = True
+    # ── Paths ──
+    output_dir: str = "/content/generated_races"
+    image_cache_dir: str = "/content/brainrot_img_cache"
+    seed: Optional[int] = None
+    background_image_path: Optional[str] = None
+
+    def __post_init__(self):
+        os.makedirs(self.output_dir, exist_ok=True)
+        os.makedirs(self.image_cache_dir, exist_ok=True)
+        if self.seed is None:
+            self.seed = random.randint(0, 2**31)
+
+print("✅ Config ready.")
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 5 — HAZARD DATA CLASSES (objetos destructivos VISIBLES)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+@dataclass
+class Fireball:
+    """Bola de fuego que REBOTA por la arena y destruye lo que toca."""
+    x: float
+    y: float
+    vx: float
+    vy: float
+    radius: float = 18.0
+    trail: list = field(default_factory=list)
+    lifetime: float = 999.0
+    color: Tuple[int, int, int] = (255, 100, 0)
+
+@dataclass
+class SpinningLaser:
+    """Rayo que gira desde un centro y destruye en su camino."""
+    cx: float
+    cy: float
+    angle: float = 0.0
+    length: float = 250.0
+    speed: float = 0.03          # rad/frame
+    thickness: float = 8.0
+    kill_radius: float = 14.0    # distancia al rayo para morir
+    color: Tuple[int, int, int] = (255, 40, 40)
+    arms: int = 2                # número de brazos (2 = línea completa)
+
+@dataclass
+class DeathWall:
+    """Pared que avanza desde un lado aplastando bolas."""
+    side: str                    # "left", "right", "top", "bottom"
+    position: float = 0.0       # posición actual (crece hacia el centro)
+    speed: float = 0.6          # píxeles/frame
+    max_position: float = 250.0
+    color: Tuple[int, int, int] = (200, 0, 0)
+
+@dataclass
+class Shockwave:
+    """Onda expansiva circular que se expande desde un punto."""
+    cx: float
+    cy: float
+    current_radius: float = 0.0
+    max_radius: float = 350.0
+    speed: float = 4.0
+    thickness: float = 12.0
+    kill_thickness: float = 18.0  # grosor de la zona letal
+    done: bool = False
+    color: Tuple[int, int, int] = (255, 255, 100)
+
+@dataclass
+class Meteor:
+    """Meteoro que cae y explota al llegar al objetivo."""
+    target_x: float
+    target_y: float
+    current_y: float            # empieza arriba de la pantalla
+    x: float = 0.0
+    speed: float = 6.0
+    radius: float = 16.0
+    blast_radius: float = 80.0
+    exploded: bool = False
+    explosion_frame: int = -1
+    warning_shown: bool = True   # mostrar indicador de peligro antes
+
+@dataclass
+class Spike:
+    """Púa estática que destruye al contacto."""
+    x: float
+    y: float
+    radius: float
+    pulse_phase: float = 0.0
+
+@dataclass
+class LavaZone:
+    """Zona de lava que crece desde los bordes."""
+    side: str
+    thickness: float = 0.0
+    max_thickness: float = 120.0
+    grow_speed: float = 0.15     # px/frame
+
+@dataclass
+class Vortex:
+    """Vórtice que atrae bolas hacia su centro (centro = muerte)."""
+    x: float
+    y: float
+    radius: float = 80.0
+    strength: float = 2.5
+    rotation: float = 0.0
+    kill_radius: float = 14.0
+
+print("✅ Hazard data classes ready.")
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 6 — BALL CLASS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class Ball:
+    __slots__ = (
+        "id", "x", "y", "vx", "vy", "radius", "color", "accent",
+        "alive", "death_frame", "trail", "name", "flash_timer",
+        "invincible_timer", "outline_color", "character", "emoji",
+        "symbol", "original_radius",
+    )
+
+    def __init__(self, ball_id: int, x: float, y: float, radius: int,
+                 color: Tuple[int, int, int], rng: random.Random,
+                 character: Dict[str, Any]):
+        self.id = ball_id
+        self.x = x
+        self.y = y
+        speed = rng.uniform(1.2, 3.0)
+        angle = rng.uniform(0, 2 * math.pi)
+        self.vx = math.cos(angle) * speed
+        self.vy = math.sin(angle) * speed
+        self.radius = radius
+        self.original_radius = radius
+        self.color = color
+        self.accent = tuple(min(255, c + 80) for c in color)
+        self.outline_color = tuple(max(0, c - 60) for c in color)
+        self.alive = True
+        self.death_frame = -1
+        self.trail: List[Tuple[float, float]] = []
+        self.name = character["name"]
+        self.emoji = character["emoji"]
+        self.symbol = character["symbol"]
+        self.flash_timer = 0.0
+        self.invincible_timer = 0.0
+        self.character = character
+
+
+def generate_vibrant_colors(n: int, rng: random.Random) -> List[Tuple[int, int, int]]:
+    colors = []
+    for i in range(n):
+        hue = (i / n + rng.uniform(-0.02, 0.02)) % 1.0
+        sat = rng.uniform(0.7, 1.0)
+        val = rng.uniform(0.75, 1.0)
+        r, g, b = colorsys.hsv_to_rgb(hue, sat, val)
+        colors.append((int(r * 255), int(g * 255), int(b * 255)))
+    rng.shuffle(colors)
+    return colors
+
+
+print("✅ Ball system ready.")
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 7 — HAZARD MANAGER (controla TODOS los objetos destructivos)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class HazardManager:
+    """Maneja la creación, actualización y detección de colisiones de todos
+    los hazards visibles del juego."""
+
+    def __init__(self, config: Config, rng: random.Random):
+        self.config = config
+        self.rng = rng
+        # ── Hazard lists ──
+        self.fireballs: List[Fireball] = []
+        self.spinning_lasers: List[SpinningLaser] = []
+        self.death_walls: List[DeathWall] = []
+        self.shockwaves: List[Shockwave] = []
+        self.meteors: List[Meteor] = []
+        self.spikes: List[Spike] = []
+        self.lava_zones: List[LavaZone] = []
+        self.vortices: List[Vortex] = []
+
+    # ──────────────────────────────────────────────────────────────────────────
+    # UPDATE — mover todos los hazards
+    # ──────────────────────────────────────────────────────────────────────────
+    def update(self, t: float, frame: int, arena: Tuple[int, int, int, int]):
+        ax1, ay1, ax2, ay2 = arena
+
+        # Fireballs: rebotan dentro de la arena
+        for fb in self.fireballs:
+            fb.trail.append((fb.x, fb.y))
+            if len(fb.trail) > 12:
+                fb.trail.pop(0)
+            fb.x += fb.vx
+            fb.y += fb.vy
+            if fb.x - fb.radius < ax1:
+                fb.x = ax1 + fb.radius
+                fb.vx = abs(fb.vx)
+            if fb.x + fb.radius > ax2:
+                fb.x = ax2 - fb.radius
+                fb.vx = -abs(fb.vx)
+            if fb.y - fb.radius < ay1:
+                fb.y = ay1 + fb.radius
+                fb.vy = abs(fb.vy)
+            if fb.y + fb.radius > ay2:
+                fb.y = ay2 - fb.radius
+                fb.vy = -abs(fb.vy)
+            fb.lifetime -= 1.0 / self.config.fps
+
+        self.fireballs = [f for f in self.fireballs if f.lifetime > 0]
+
+        # Spinning lasers: rotan
+        for sl in self.spinning_lasers:
+            sl.angle += sl.speed
+
+        # Death walls: avanzan
+        for dw in self.death_walls:
+            if dw.position < dw.max_position:
+                dw.position += dw.speed
+
+        # Shockwaves: se expanden
+        for sw in self.shockwaves:
+            if not sw.done:
+                sw.current_radius += sw.speed
+                if sw.current_radius >= sw.max_radius:
+                    sw.done = True
+        self.shockwaves = [s for s in self.shockwaves if not s.done]
+
+        # Meteors: caen
+        for m in self.meteors:
+            if not m.exploded:
+                m.current_y += m.speed
+                if m.current_y >= m.target_y:
+                    m.exploded = True
+                    m.explosion_frame = frame
+        self.meteors = [m for m in self.meteors
+                        if not m.exploded or frame - m.explosion_frame < 30]
+
+        # Spikes: pulsan
+        for sp in self.spikes:
+            sp.pulse_phase += 0.1
+
+        # Lava: crece gradualmente
+        for lz in self.lava_zones:
+            if lz.thickness < lz.max_thickness:
+                lz.thickness += lz.grow_speed
+
+        # Vortices: rotan
+        for v in self.vortices:
+            v.rotation += 0.08
+
+        # Limitar cantidades
+        if len(self.spikes) > 35:
+            self.spikes = self.spikes[-30:]
+        if len(self.fireballs) > 8:
+            self.fireballs = self.fireballs[-6:]
+
+    # ──────────────────────────────────────────────────────────────────────────
+    # CHECK COLLISIONS — ¿esta bola debe morir?
+    # ──────────────────────────────────────────────────────────────────────────
+    def check_ball_death(self, ball: Ball, frame: int,
+                         arena: Tuple[int, int, int, int]) -> bool:
+        """Retorna True si la bola colisiona con algún hazard letal."""
+        if not ball.alive or ball.invincible_timer > 0:
+            return False
+        bx, by, br = ball.x, ball.y, ball.radius
+        ax1, ay1, ax2, ay2 = arena
+
+        # ── Fireballs ──
+        for fb in self.fireballs:
+            dist = math.hypot(bx - fb.x, by - fb.y)
+            if dist < fb.radius + br:
+                return True
+
+        # ── Spinning Lasers ──
+        for sl in self.spinning_lasers:
+            for arm_i in range(sl.arms):
+                arm_angle = sl.angle + arm_i * (2 * math.pi / sl.arms)
+                ex = sl.cx + math.cos(arm_angle) * sl.length
+                ey = sl.cy + math.sin(arm_angle) * sl.length
+                dist = self._point_line_dist(bx, by, sl.cx, sl.cy, ex, ey)
+                if dist < sl.kill_radius + br:
+                    return True
+
+        # ── Death Walls ──
+        for dw in self.death_walls:
+            if dw.position <= 0:
+                continue
+            if dw.side == "left" and bx - br < ax1 + dw.position:
+                return True
+            if dw.side == "right" and bx + br > ax2 - dw.position:
+                return True
+            if dw.side == "top" and by - br < ay1 + dw.position:
+                return True
+            if dw.side == "bottom" and by + br > ay2 - dw.position:
+                return True
+
+        # ── Shockwaves ──
+        for sw in self.shockwaves:
+            dist = math.hypot(bx - sw.cx, by - sw.cy)
+            inner = sw.current_radius - sw.kill_thickness / 2
+            outer = sw.current_radius + sw.kill_thickness / 2
+            if inner < dist < outer:
+                return True
+
+        # ── Meteors (explosión) ──
+        for m in self.meteors:
+            if m.exploded and frame - m.explosion_frame < 8:
+                dist = math.hypot(bx - m.target_x, by - m.target_y)
+                if dist < m.blast_radius:
+                    return True
+
+        # ── Spikes ──
+        for sp in self.spikes:
+            pulse = 1.0 + 0.15 * math.sin(sp.pulse_phase)
+            if math.hypot(bx - sp.x, by - sp.y) < sp.radius * pulse + br:
+                return True
+
+        # ── Lava Zones ──
+        for lz in self.lava_zones:
+            th = lz.thickness
+            if th <= 0:
+                continue
+            if lz.side == "bottom" and by + br > ay2 - th:
+                return True
+            if lz.side == "top" and by - br < ay1 + th:
+                return True
+            if lz.side == "left" and bx - br < ax1 + th:
+                return True
+            if lz.side == "right" and bx + br > ax2 - th:
+                return True
+
+        # ── Vortex center kill ──
+        for v in self.vortices:
+            if math.hypot(bx - v.x, by - v.y) < v.kill_radius:
+                return True
+
+        return False
+
+    # ──────────────────────────────────────────────────────────────────────────
+    # VORTEX PULL — fuerza de atracción
+    # ──────────────────────────────────────────────────────────────────────────
+    def apply_vortex_force(self, ball: Ball):
+        for v in self.vortices:
+            dx = v.x - ball.x
+            dy = v.y - ball.y
+            dist = math.hypot(dx, dy)
+            if 0 < dist < v.radius:
+                force = v.strength * (1.0 - dist / v.radius) / max(dist, 1.0)
+                ball.vx += dx * force * 0.04
+                ball.vy += dy * force * 0.04
+
+    @staticmethod
+    def _point_line_dist(px, py, x1, y1, x2, y2) -> float:
+        dx, dy = x2 - x1, y2 - y1
+        if dx == 0 and dy == 0:
+            return math.hypot(px - x1, py - y1)
+        t = max(0, min(1, ((px - x1) * dx + (py - y1) * dy) / (dx * dx + dy * dy)))
+        return math.hypot(px - (x1 + t * dx), py - (y1 + t * dy))
+
+print("✅ Hazard system ready.")
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 8 — CHALLENGE POOL (cada reto añade hazards VISIBLES)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+ALL_CHALLENGES: List[Dict[str, Any]] = []
+
+def _register(name, emoji, category):
+    def decorator(func):
+        ALL_CHALLENGES.append({"name": name, "emoji": emoji,
+                                "category": category, "apply": func})
+        return func
+    return decorator
+
+
+@_register("FIREBALL FRENZY", "🔥", "fireball")
+def _ch_fireball(balls, arena, hazards, rng, config, **kw):
+    ax1, ay1, ax2, ay2 = arena
+    for _ in range(rng.randint(2, 4)):
+        angle = rng.uniform(0, 2 * math.pi)
+        speed = rng.uniform(3.5, 6.0)
+        hazards.fireballs.append(Fireball(
+            x=rng.uniform(ax1 + 40, ax2 - 40),
+            y=rng.uniform(ay1 + 40, ay2 - 40),
+            vx=math.cos(angle) * speed,
+            vy=math.sin(angle) * speed,
+            radius=rng.uniform(14, 22),
+            lifetime=rng.uniform(15, 25),
+            color=(255, rng.randint(50, 150), 0),
+        ))
+
+
+@_register("SPINNING DEATH RAY", "⚡", "laser")
+def _ch_spinning_laser(balls, arena, hazards, rng, config, **kw):
+    ax1, ay1, ax2, ay2 = arena
+    cx, cy = (ax1 + ax2) / 2, (ay1 + ay2) / 2
+    length = min(ax2 - ax1, ay2 - ay1) * 0.48
+    hazards.spinning_lasers.append(SpinningLaser(
+        cx=cx + rng.uniform(-30, 30),
+        cy=cy + rng.uniform(-30, 30),
+        angle=rng.uniform(0, 2 * math.pi),
+        length=length,
+        speed=rng.uniform(0.015, 0.04),
+        thickness=rng.uniform(6, 10),
+        kill_radius=rng.uniform(10, 16),
+        arms=rng.choice([2, 3, 4]),
+    ))
+
+
+@_register("DEATH WALL", "🧱", "wall")
+def _ch_death_wall(balls, arena, hazards, rng, config, **kw):
+    sides = rng.sample(["left", "right", "top", "bottom"], rng.randint(1, 2))
+    for side in sides:
+        hazards.death_walls.append(DeathWall(
+            side=side,
+            speed=rng.uniform(0.3, 0.8),
+            max_position=rng.uniform(80, 180),
+            color=(rng.randint(180, 255), 0, 0),
+        ))
+
+
+@_register("SHOCKWAVE BLAST", "💥", "shockwave")
+def _ch_shockwave(balls, arena, hazards, rng, config, **kw):
+    ax1, ay1, ax2, ay2 = arena
+    hazards.shockwaves.append(Shockwave(
+        cx=rng.uniform(ax1 + 50, ax2 - 50),
+        cy=rng.uniform(ay1 + 50, ay2 - 50),
+        speed=rng.uniform(2.5, 5.0),
+        max_radius=min(ax2 - ax1, ay2 - ay1) * rng.uniform(0.5, 0.8),
+        thickness=rng.uniform(10, 18),
+        kill_thickness=rng.uniform(14, 24),
+        color=(255, 255, rng.randint(50, 200)),
+    ))
+
+
+@_register("METEOR SHOWER", "☄️", "meteor")
+def _ch_meteor(balls, arena, hazards, rng, config, **kw):
+    ax1, ay1, ax2, ay2 = arena
+    for _ in range(rng.randint(5, 10)):
+        tx = rng.uniform(ax1 + 30, ax2 - 30)
+        ty = rng.uniform(ay1 + 30, ay2 - 30)
+        hazards.meteors.append(Meteor(
+            target_x=tx, target_y=ty,
+            current_y=ay1 - rng.uniform(100, 300),
+            x=tx,
+            speed=rng.uniform(4, 8),
+            radius=rng.uniform(10, 18),
+            blast_radius=rng.uniform(50, 100),
+        ))
+
+
+@_register("SPIKE MINEFIELD", "⚠️", "spikes")
+def _ch_spikes(balls, arena, hazards, rng, config, **kw):
+    ax1, ay1, ax2, ay2 = arena
+    for _ in range(rng.randint(10, 20)):
+        hazards.spikes.append(Spike(
+            x=rng.uniform(ax1 + 25, ax2 - 25),
+            y=rng.uniform(ay1 + 25, ay2 - 25),
+            radius=rng.uniform(10, 25),
+            pulse_phase=rng.uniform(0, math.pi * 2),
+        ))
+
+
+@_register("LAVA SURGE", "🌋", "lava")
+def _ch_lava(balls, arena, hazards, rng, config, **kw):
+    existing_sides = {lz.side for lz in hazards.lava_zones}
+    for side in ["bottom", "left", "right", "top"]:
+        if side not in existing_sides:
+            hazards.lava_zones.append(LavaZone(
+                side=side,
+                grow_speed=rng.uniform(0.08, 0.25),
+                max_thickness=rng.uniform(60, 130),
+            ))
+        else:
+            for lz in hazards.lava_zones:
+                if lz.side == side:
+                    lz.max_thickness += rng.uniform(20, 50)
+                    lz.grow_speed += 0.05
+
+
+@_register("BLACK HOLE", "⚫", "vortex")
+def _ch_vortex(balls, arena, hazards, rng, config, **kw):
+    ax1, ay1, ax2, ay2 = arena
+    hazards.vortices.append(Vortex(
+        x=rng.uniform(ax1 + 60, ax2 - 60),
+        y=rng.uniform(ay1 + 60, ay2 - 60),
+        radius=rng.uniform(70, 130),
+        strength=rng.uniform(2.0, 4.5),
+        kill_radius=rng.uniform(10, 18),
+    ))
+
+
+@_register("SPEED BOOST", "🚀", "speed")
+def _ch_speed(balls, arena, hazards, rng, config, **kw):
+    for b in balls:
+        if b.alive:
+            b.vx *= rng.uniform(1.8, 2.5)
+            b.vy *= rng.uniform(1.8, 2.5)
+
+
+@_register("TELEPORT SHUFFLE", "✨", "teleport")
+def _ch_teleport(balls, arena, hazards, rng, config, **kw):
+    ax1, ay1, ax2, ay2 = arena
+    for b in balls:
+        if b.alive:
+            b.x = rng.uniform(ax1 + 20, ax2 - 20)
+            b.y = rng.uniform(ay1 + 20, ay2 - 20)
+
+
+@_register("SCATTER SHOT", "💫", "scatter")
+def _ch_scatter(balls, arena, hazards, rng, config, **kw):
+    ax1, ay1, ax2, ay2 = arena
+    cx, cy = (ax1 + ax2) / 2, (ay1 + ay2) / 2
+    for b in balls:
+        if b.alive:
+            dx, dy = b.x - cx, b.y - cy
+            dist = math.hypot(dx, dy) + 0.01
+            force = rng.uniform(4, 7)
+            b.vx += (dx / dist) * force
+            b.vy += (dy / dist) * force
+
+
+@_register("IMPLOSION", "🌀", "implode")
+def _ch_implode(balls, arena, hazards, rng, config, **kw):
+    ax1, ay1, ax2, ay2 = arena
+    cx, cy = (ax1 + ax2) / 2, (ay1 + ay2) / 2
+    for b in balls:
+        if b.alive:
+            dx, dy = cx - b.x, cy - b.y
+            dist = math.hypot(dx, dy) + 0.01
+            force = rng.uniform(3, 6)
+            b.vx += (dx / dist) * force
+            b.vy += (dy / dist) * force
+
+
+@_register("EARTHQUAKE", "🫨", "earthquake")
+def _ch_earthquake(balls, arena, hazards, rng, config, **kw):
+    for b in balls:
+        if b.alive:
+            b.vx += rng.uniform(-5, 5)
+            b.vy += rng.uniform(-5, 5)
+
+
+@_register("DOUBLE FIREBALL + LASER", "🔥⚡", "combo1")
+def _ch_combo1(balls, arena, hazards, rng, config, **kw):
+    _ch_fireball(balls, arena, hazards, rng, config, **kw)
+    _ch_spinning_laser(balls, arena, hazards, rng, config, **kw)
+
+
+@_register("METEOR + SHOCKWAVE", "☄️💥", "combo2")
+def _ch_combo2(balls, arena, hazards, rng, config, **kw):
+    _ch_meteor(balls, arena, hazards, rng, config, **kw)
+    _ch_shockwave(balls, arena, hazards, rng, config, **kw)
+
+
+@_register("TRIPLE THREAT", "💀💀💀", "combo3")
+def _ch_combo3(balls, arena, hazards, rng, config, **kw):
+    ax1, ay1, ax2, ay2 = arena
+    # Fireballs + spikes + death wall
+    for _ in range(2):
+        angle = rng.uniform(0, 2 * math.pi)
+        hazards.fireballs.append(Fireball(
+            x=(ax1 + ax2) / 2, y=(ay1 + ay2) / 2,
+            vx=math.cos(angle) * 5, vy=math.sin(angle) * 5,
+            radius=20, lifetime=20))
+    for _ in range(8):
+        hazards.spikes.append(Spike(
+            rng.uniform(ax1 + 20, ax2 - 20),
+            rng.uniform(ay1 + 20, ay2 - 20),
+            rng.uniform(12, 22), 0))
+    hazards.death_walls.append(DeathWall(
+        side=rng.choice(["left", "right", "top", "bottom"]),
+        speed=0.5, max_position=120))
+
+
+@_register("INVINCIBILITY ROULETTE", "🛡️", "invincible")
+def _ch_invincible(balls, arena, hazards, rng, config, **kw):
+    alive = [b for b in balls if b.alive]
+    lucky = rng.sample(alive, min(len(alive), max(1, len(alive) // 4)))
+    for b in lucky:
+        b.invincible_timer = rng.uniform(4.0, 8.0)
+
+
+@_register("ARENA SHRINK", "🔬", "shrink")
+def _ch_shrink(balls, arena, hazards, rng, config, **kw):
+    config.arena_margin_end = min(config.arena_margin_end + 40,
+                                  min(config.width, config.height) // 2 - 50)
+
+
+@_register("FREEZE FRAME", "🧊", "freeze")
+def _ch_freeze(balls, arena, hazards, rng, config, **kw):
+    for b in balls:
+        if b.alive:
+            b.vx *= 0.08
+            b.vy *= 0.08
+
+
+@_register("REVERSE GRAVITY", "🔄", "reverse")
+def _ch_reverse(balls, arena, hazards, rng, config, **kw):
+    for b in balls:
+        if b.alive:
+            b.vx = -b.vx
+            b.vy = -b.vy
+
+
+@_register("BUMPER CARS", "🏎️", "bumper")
+def _ch_bumper(balls, arena, hazards, rng, config, **kw):
+    for b in balls:
+        if b.alive:
+            angle = rng.uniform(0, 2 * math.pi)
+            spd = rng.uniform(4, 7)
+            b.vx = math.cos(angle) * spd
+            b.vy = math.sin(angle) * spd
+
+
+@_register("TORNADO", "🌪️", "tornado")
+def _ch_tornado(balls, arena, hazards, rng, config, **kw):
+    ax1, ay1, ax2, ay2 = arena
+    hazards.vortices.append(Vortex(
+        x=rng.uniform(ax1 + 60, ax2 - 60),
+        y=rng.uniform(ay1 + 60, ay2 - 60),
+        radius=rng.uniform(90, 150),
+        strength=rng.uniform(3.0, 5.5),
+        kill_radius=rng.uniform(12, 20),
+    ))
+    for b in balls:
+        if b.alive:
+            b.vx += rng.uniform(-3, 3)
+            b.vy += rng.uniform(-3, 3)
+
+
+@_register("THANOS SNAP", "🫰💀", "thanos")
+def _ch_thanos(balls, arena, hazards, rng, config, **kw):
+    """Elimina exactamente la mitad de las bolas vivas — pero con
+    una shockwave visible primero."""
+    ax1, ay1, ax2, ay2 = arena
+    cx, cy = (ax1 + ax2) / 2, (ay1 + ay2) / 2
+    hazards.shockwaves.append(Shockwave(
+        cx=cx, cy=cy, speed=6.0,
+                max_radius=max(ax2 - ax1, ay2 - ay1) * 0.7,
+        thickness=20, kill_thickness=30,
+        color=(200, 100, 255),
+    ))
+
+
+print(f"✅ {len(ALL_CHALLENGES)} challenges registered.")
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 9 — PHYSICS ENGINE
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class PhysicsEngine:
+    def __init__(self, config: Config):
+        self.config = config
+
+    def get_arena(self, t: float) -> Tuple[int, int, int, int]:
+        progress = min(1.0, t / self.config.duration)
+        ease = progress * progress
+        margin = (self.config.arena_margin_start +
+                  (self.config.arena_margin_end - self.config.arena_margin_start) * ease)
+        cx = self.config.width / 2
+        cy = self.config.height / 2
+        half_size = min(cx, cy) - margin
+        half_size = max(half_size, 50)
+        x1 = int(cx - half_size)
+        y1 = int(cy - half_size)
+        x2 = int(cx + half_size)
+        y2 = int(cy + half_size)
+        return (x1, y1, x2, y2)
+
+    def update_balls(self, balls: List[Ball], arena: Tuple[int, int, int, int],
+                     hazards: HazardManager, frame: int):
+        ax1, ay1, ax2, ay2 = arena
+        dt = 1.0 / self.config.fps
+        alive_balls = [b for b in balls if b.alive]
+
+        for ball in alive_balls:
+            if ball.invincible_timer > 0:
+                ball.invincible_timer -= dt
+
+            # Vortex pull
+            hazards.apply_vortex_force(ball)
+
+            # Trail
+            ball.trail.append((ball.x, ball.y))
+            if len(ball.trail) > 8:
+                ball.trail.pop(0)
+
+            # Move
+            ball.x += ball.vx
+            ball.y += ball.vy
+
+            # Tiny random perturbation
+            ball.vx += random.gauss(0, 0.06)
+            ball.vy += random.gauss(0, 0.06)
+
+            # Speed cap
+            speed = math.hypot(ball.vx, ball.vy)
+            max_speed = 6.5
+            if speed > max_speed:
+                ball.vx = ball.vx / speed * max_speed
+                ball.vy = ball.vy / speed * max_speed
+
+            # Wall bounce
+            r = ball.radius
+            if ball.x - r < ax1:
+                ball.x = ax1 + r
+                ball.vx = abs(ball.vx) * self.config.bounce_damping
+            if ball.x + r > ax2:
+                ball.x = ax2 - r
+                ball.vx = -abs(ball.vx) * self.config.bounce_damping
+            if ball.y - r < ay1:
+                ball.y = ay1 + r
+                ball.vy = abs(ball.vy) * self.config.bounce_damping
+            if ball.y + r > ay2:
+                ball.y = ay2 - r
+                ball.vy = -abs(ball.vy) * self.config.bounce_damping
+
+        self._ball_ball_collisions(alive_balls)
+
+    def _ball_ball_collisions(self, balls: List[Ball]):
+        n = len(balls)
+        for i in range(n):
+            for j in range(i + 1, n):
+                b1, b2 = balls[i], balls[j]
+                dx = b2.x - b1.x
+                dy = b2.y - b1.y
+                dist = math.hypot(dx, dy)
+                min_dist = b1.radius + b2.radius
+                if dist < min_dist and dist > 0.01:
+                    nx = dx / dist
+                    ny = dy / dist
+                    overlap = min_dist - dist
+                    b1.x -= nx * overlap * 0.5
+                    b1.y -= ny * overlap * 0.5
+                    b2.x += nx * overlap * 0.5
+                    b2.y += ny * overlap * 0.5
+                    dvx = b1.vx - b2.vx
+                    dvy = b1.vy - b2.vy
+                    dot = dvx * nx + dvy * ny
+                    if dot > 0:
+                        b1.vx -= dot * nx * self.config.ball_ball_push
+                        b1.vy -= dot * ny * self.config.ball_ball_push
+                        b2.vx += dot * nx * self.config.ball_ball_push
+                        b2.vy += dot * ny * self.config.ball_ball_push
+
+print("✅ Physics engine ready.")
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 10 — RENDERER (FULL VISUAL ENGINE)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class Renderer:
+    def __init__(self, config: Config, character_images: Dict[str, Image.Image]):
+        self.config = config
+        self.w = config.width
+        self.h = config.height
+        self._font_cache: Dict[int, Any] = {}
+        self._death_particles: List[Dict] = []
+        self._bubble_particles: List[Dict] = []
+        self._event_display: List[Tuple[int, str]] = []
+        self._challenge_banner: Optional[Tuple[int, str, str]] = None
+        self._character_images = character_images
+        self._elimination_feed: List[Tuple[int, str, Tuple[int, int, int]]] = []
+        self._screen_shake: float = 0.0
+        self._background_img: Optional[Image.Image] = None
+
+        if config.background_image_path and os.path.exists(config.background_image_path):
+            try:
+                bg = Image.open(config.background_image_path).convert("RGB")
+                self._background_img = bg.resize((config.width, config.height),
+                                                  Image.LANCZOS)
+            except Exception:
+                self._background_img = None
+
+    # ── Font helper ──
+    def _font(self, size: int):
+        size = max(size, 8)
+        if size not in self._font_cache:
+            for path in [
+                "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+                "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
+            ]:
+                if os.path.exists(path):
+                    self._font_cache[size] = ImageFont.truetype(path, size)
+                    return self._font_cache[size]
+            self._font_cache[size] = ImageFont.load_default()
+        return self._font_cache[size]
+
+    # ── Outlined text ──
+    def _outlined_text(self, draw, pos, text, font, fill, outline=(0, 0, 0),
+                       outline_w=3):
+        x, y = pos
+        for dx in range(-outline_w, outline_w + 1):
+            for dy in range(-outline_w, outline_w + 1):
+                if dx * dx + dy * dy <= outline_w * outline_w:
+                    draw.text((x + dx, y + dy), text, font=font, fill=outline)
+        draw.text((x, y), text, font=font, fill=fill)
+
+    # ── Event text ──
+    def add_event_text(self, frame: int, text: str, duration_frames: int = 50):
+        self._event_display.append((frame + duration_frames, text))
+
+    # ── Challenge banner ──
+    def set_challenge_banner(self, frame: int, name: str, emoji: str,
+                             duration_frames: int = 90):
+        self._challenge_banner = (frame + duration_frames, name, emoji)
+
+    # ── Screen shake ──
+    def trigger_screen_shake(self, intensity: float = 6.0):
+        self._screen_shake = max(self._screen_shake, intensity)
+
+    # ── Death particles ──
+    def add_death_particles(self, x: float, y: float,
+                            color: Tuple[int, int, int], frame: int):
+        for _ in range(18):
+            angle = random.uniform(0, 2 * math.pi)
+            speed = random.uniform(2, 9)
+            self._death_particles.append({
+                "x": x, "y": y,
+                "vx": math.cos(angle) * speed,
+                "vy": math.sin(angle) * speed,
+                "color": color, "life": 1.0,
+                "size": random.uniform(2, 7),
+            })
+
+    # ── Bubble explosion ──
+    def add_bubble_explosion(self, x: float, y: float,
+                             color: Tuple[int, int, int], frame: int):
+        for _ in range(random.randint(8, 16)):
+            angle = random.uniform(0, 2 * math.pi)
+            speed = random.uniform(1.0, 4.5)
+            br = random.uniform(4, 14)
+            self._bubble_particles.append({
+                "x": x, "y": y,
+                "vx": math.cos(angle) * speed,
+                "vy": math.sin(angle) * speed - random.uniform(0.5, 2.0),
+                "radius": br,
+                "max_radius": br * random.uniform(1.3, 2.0),
+                "color": color, "life": 1.0,
+                "decay": random.uniform(0.015, 0.035),
+                "wobble_phase": random.uniform(0, math.pi * 2),
+                "wobble_speed": random.uniform(0.1, 0.3),
+            })
+        self.trigger_screen_shake(4.0)
+
+    # ── Elimination feed ──
+    def add_elimination(self, frame: int, name: str, color: Tuple[int, int, int]):
+        self._elimination_feed.append((frame + 90, name, color))
+        if len(self._elimination_feed) > 5:
+            self._elimination_feed = self._elimination_feed[-5:]
+
+    # ══════════════════════════════════════════════════════════════════════════
+    # MAIN RENDER FRAME
+    # ══════════════════════════════════════════════════════════════════════════
+    def render_frame(self, t: float, frame: int, balls: List[Ball],
+                     arena: Tuple[int, int, int, int],
+                     hazards: HazardManager,
+                     alive_count: int, total: int,
+                     winner: Optional[Ball],
+                     phase: str,
+                     selected_challenges: List[Dict],
+                     challenge_index: int) -> np.ndarray:
+        w, h = self.w, self.h
+        ax1, ay1, ax2, ay2 = arena
+
+        # Screen shake offset
+        shake_x, shake_y = 0, 0
+        if self._screen_shake > 0.5:
+            shake_x = int(random.uniform(-self._screen_shake, self._screen_shake))
+            shake_y = int(random.uniform(-self._screen_shake, self._screen_shake))
+            self._screen_shake *= 0.88
+
+        # Background
+        if self._background_img is not None:
+            img = self._background_img.copy()
+            dark = Image.new("RGB", (w, h), (0, 0, 0))
+            img = Image.blend(img, dark, 0.4)
+        else:
+            img = Image.new("RGB", (w, h), (10, 8, 18))
+
+        draw = ImageDraw.Draw(img)
+
+        # Grid
+        if self._background_img is None:
+            grid_c = (25, 22, 40)
+            for gx in range(0, w, 40):
+                draw.line([(gx, 0), (gx, h)], fill=grid_c, width=1)
+            for gy in range(0, h, 40):
+                draw.line([(0, gy), (w, gy)], fill=grid_c, width=1)
+
+        # Arena background gradient
+        for row_i in range(max(0, ay1), min(h, ay2)):
+            rp = (row_i - ay1) / max(1, ay2 - ay1)
+            rb = int(self.config.arena_color[0] + rp * 8)
+            gb = int(self.config.arena_color[1] + rp * 5)
+            bb = int(self.config.arena_color[2] + rp * 12)
+            draw.line([(ax1, row_i), (ax2, row_i)],
+                      fill=(min(255, rb), min(255, gb), min(255, bb)))
+
+        # ── Render hazards ──
+        self._render_hazards(draw, img, hazards, arena, frame, t)
+
+        # Arena border
+        progress = min(1.0, t / self.config.duration)
+        pulse = 1.0 + 0.3 * math.sin(t * 3)
+        bw = max(2, int(self.config.arena_border_width * pulse))
+        br_c = int(255 * (0.5 + 0.5 * progress))
+        bg_c = int(255 * (1.0 - progress * 0.7))
+        bb_c = int(255 * (1.0 - progress * 0.8))
+        draw.rectangle([ax1, ay1, ax2, ay2], outline=(br_c, bg_c, bb_c), width=bw)
+
+        # Corner markers
+        ms = 12 + int(6 * math.sin(t * 5))
+        for cx_m, cy_m in [(ax1, ay1), (ax2, ay1), (ax1, ay2), (ax2, ay2)]:
+            draw.rectangle([cx_m - ms // 2, cy_m - ms // 2,
+                            cx_m + ms // 2, cy_m + ms // 2],
+                           fill=(255, 50, 50))
+
+        # Death particles
+        self._update_and_render_particles(draw, frame)
+
+        # Bubble particles
+        self._update_and_render_bubbles(draw, img, frame)
+
+        # Render balls
+        alive_balls = sorted([b for b in balls if b.alive], key=lambda b: b.y)
+        for ball in alive_balls:
+            self._render_ball(draw, img, ball, frame)
+
+        # HUD
+        self._render_hud(draw, img, t, frame, alive_count, total, phase,
+                         winner, balls, selected_challenges, challenge_index)
+
+        # Elimination feed
+        self._render_elimination_feed(draw, frame)
+
+        # Challenge banner
+        self._render_challenge_banner(draw, frame)
+
+        # Phase overlays
+        if phase == "countdown":
+            self._render_countdown(draw, t)
+        elif phase == "winner" and winner:
+            img = self._render_winner_screen(img, draw, winner, t, frame)
+
+        # Apply screen shake
+        if abs(shake_x) > 0 or abs(shake_y) > 0:
+            shifted = Image.new("RGB", (w, h), (10, 8, 18))
+            shifted.paste(img, (shake_x, shake_y))
+            img = shifted
+
+        return np.array(img, dtype=np.uint8)
+
+    # ══════════════════════════════════════════════════════════════════════════
+    # RENDER INDIVIDUAL BALL (with character image)
+    # ══════════════════════════════════════════════════════════════════════════
+    def _render_ball(self, draw: ImageDraw.Draw, img: Image.Image,
+                     ball: Ball, frame: int):
+        x, y, r = int(ball.x), int(ball.y), ball.radius
+
+        # Trail
+        for i, (tx, ty) in enumerate(ball.trail):
+            af = (i + 1) / (len(ball.trail) + 1)
+            tr = max(2, int(r * af * 0.5))
+            c = tuple(int(v * af * 0.4) for v in ball.color)
+            draw.ellipse([int(tx) - tr, int(ty) - tr,
+                          int(tx) + tr, int(ty) + tr], fill=c)
+
+        # Shadow
+        draw.ellipse([x - r + 3, y - r + 3, x + r + 3, y + r + 3],
+                     fill=(0, 0, 0))
+
+        # Invincible glow
+        if ball.invincible_timer > 0:
+            gr = r + 5 + int(math.sin(frame * 0.5) * 3)
+            draw.ellipse([x - gr, y - gr, x + gr, y + gr],
+                         outline=(255, 255, 100), width=3)
+
+        # Main ball
+        draw.ellipse([x - r, y - r, x + r, y + r],
+                     fill=ball.color, outline=ball.outline_color,
+                     width=self.config.ball_outline_width)
+
+        # Shine
+        sr = max(2, r // 3)
+        sx, sy = x - r // 3, y - r // 3
+        draw.ellipse([sx - sr, sy - sr, sx + sr, sy + sr], fill=ball.accent)
+
+        # Character image overlay
+        char_img = self._character_images.get(ball.name)
+        if char_img is not None:
+            icon_size = r * 2
+            if icon_size >= 6:
+                try:
+                    resized = char_img.resize((icon_size, icon_size), Image.NEAREST)
+                    # Crear máscara circular
+                    mask = Image.new("L", (icon_size, icon_size), 0)
+                    mask_draw = ImageDraw.Draw(mask)
+                    mask_draw.ellipse([0, 0, icon_size - 1, icon_size - 1], fill=255)
+                    px = x - icon_size // 2
+                    py = y - icon_size // 2
+                    img.paste(resized, (px, py), mask)
+                except Exception:
+                    pass
+
+        # Name label
+        if r >= 8:
+            nf = self._font(max(8, min(12, r - 1)))
+            short = ball.name[:8]
+            bbox_n = draw.textbbox((0, 0), short, font=nf)
+            tw_n = bbox_n[2] - bbox_n[0]
+            lx = x - tw_n // 2
+            ly = y + r + 3
+            self._outlined_text(draw, (lx, ly), short, nf,
+                                (255, 255, 255), outline_w=2)
+
+    # ══════════════════════════════════════════════════════════════════════════
+    # RENDER HAZARDS (all visible destructive objects)
+    # ══════════════════════════════════════════════════════════════════════════
+    def _render_hazards(self, draw: ImageDraw.Draw, img: Image.Image,
+                        hazards: HazardManager,
+                        arena: Tuple[int, int, int, int],
+                        frame: int, t: float):
+        ax1, ay1, ax2, ay2 = arena
+
+        # ── Lava Zones ──
+        for lz in hazards.lava_zones:
+            if lz.thickness <= 0:
+                continue
+            th = int(lz.thickness)
+            flicker = int(random.uniform(-8, 8))
+            lava_colors = [
+                (255, 60 + flicker, 0),
+                (255, 120 + flicker, 0),
+                (255, 180, 50),
+            ]
+            if lz.side == "bottom":
+                for row in range(min(th, ay2 - ay1)):
+                    yl = ay2 - th + row
+                    if ay1 <= yl <= ay2:
+                        ci = min(len(lava_colors) - 1,
+                                 int(row / max(1, th) * len(lava_colors)))
+                        draw.line([(ax1 + 1, yl), (ax2 - 1, yl)],
+                                  fill=lava_colors[ci])
+            elif lz.side == "top":
+                for row in range(min(th, ay2 - ay1)):
+                    yl = ay1 + row
+                    if ay1 <= yl <= ay2:
+                        ci = min(len(lava_colors) - 1,
+                                 int((1.0 - row / max(1, th)) * len(lava_colors)))
+                        draw.line([(ax1 + 1, yl), (ax2 - 1, yl)],
+                                  fill=lava_colors[ci])
+            elif lz.side == "left":
+                for col in range(min(th, ax2 - ax1)):
+                    xl = ax1 + col
+                    if ax1 <= xl <= ax2:
+                        ci = min(len(lava_colors) - 1,
+                                 int((1.0 - col / max(1, th)) * len(lava_colors)))
+                        draw.line([(xl, ay1 + 1), (xl, ay2 - 1)],
+                                  fill=lava_colors[ci])
+            elif lz.side == "right":
+                for col in range(min(th, ax2 - ax1)):
+                    xl = ax2 - th + col
+                    if ax1 <= xl <= ax2:
+                        ci = min(len(lava_colors) - 1,
+                                 int(col / max(1, th) * len(lava_colors)))
+                        draw.line([(xl, ay1 + 1), (xl, ay2 - 1)],
+                                  fill=lava_colors[ci])
+            # Lava bubbles
+            if th > 5:
+                for _ in range(3):
+                    if lz.side == "bottom":
+                        bx = random.randint(ax1 + 5, max(ax1 + 6, ax2 - 5))
+                        by = ay2 - random.randint(2, max(3, th))
+                    elif lz.side == "top":
+                        bx = random.randint(ax1 + 5, max(ax1 + 6, ax2 - 5))
+                        by = ay1 + random.randint(2, max(3, th))
+                    elif lz.side == "left":
+                        bx = ax1 + random.randint(2, max(3, th))
+                        by = random.randint(ay1 + 5, max(ay1 + 6, ay2 - 5))
+                    else:
+                        bx = ax2 - random.randint(2, max(3, th))
+                        by = random.randint(ay1 + 5, max(ay1 + 6, ay2 - 5))
+                    bbr = random.randint(2, 5)
+                    draw.ellipse([bx - bbr, by - bbr, bx + bbr, by + bbr],
+                                 fill=(255, 220, 80))
+
+        # ── Spikes ──
+        for sp in hazards.spikes:
+            pulse = 1.0 + 0.15 * math.sin(sp.pulse_phase)
+            sr_s = int(sp.radius * pulse)
+            sx, sy = int(sp.x), int(sp.y)
+            points = []
+            num_pts = 8
+            for ip in range(num_pts * 2):
+                a = ip * math.pi / num_pts - math.pi / 2
+                r_s = sr_s if ip % 2 == 0 else sr_s // 2
+                points.append((sx + int(math.cos(a) * r_s),
+                                sy + int(math.sin(a) * r_s)))
+            if len(points) >= 3:
+                draw.polygon(points, fill=(200, 200, 200),
+                             outline=(255, 80, 80), width=2)
+            draw.ellipse([sx - sr_s - 3, sy - sr_s - 3,
+                          sx + sr_s + 3, sy + sr_s + 3],
+                         outline=(255, 50, 50), width=1)
+
+        # ── Fireballs (bola de fuego que rebota) ──
+        for fb in hazards.fireballs:
+            # Trail glow
+            for i_t, (tx, ty) in enumerate(fb.trail):
+                af = (i_t + 1) / (len(fb.trail) + 1)
+                tr = max(2, int(fb.radius * af * 0.8))
+                fc = tuple(int(c * af * 0.6) for c in fb.color)
+                draw.ellipse([int(tx) - tr, int(ty) - tr,
+                              int(tx) + tr, int(ty) + tr], fill=fc)
+            # Outer glow
+            gr = int(fb.radius * 1.6)
+            fbx, fby = int(fb.x), int(fb.y)
+            draw.ellipse([fbx - gr, fby - gr, fbx + gr, fby + gr],
+                         fill=(255, 80, 0))
+            # Core
+            fbr = int(fb.radius)
+            draw.ellipse([fbx - fbr, fby - fbr, fbx + fbr, fby + fbr],
+                         fill=fb.color, outline=(255, 255, 100), width=2)
+            # Inner bright core
+            cr = max(2, fbr // 2)
+            draw.ellipse([fbx - cr, fby - cr, fbx + cr, fby + cr],
+                         fill=(255, 255, 200))
+            # Fire emoji label
+            ff = self._font(max(10, fbr))
+            draw.text((fbx - fbr // 2, fby - fbr // 2), "🔥", font=ff)
+
+        # ── Spinning Lasers ──
+        for sl in hazards.spinning_lasers:
+            scx, scy = int(sl.cx), int(sl.cy)
+            for arm_i in range(sl.arms):
+                arm_angle = sl.angle + arm_i * (2 * math.pi / sl.arms)
+                ex = int(sl.cx + math.cos(arm_angle) * sl.length)
+                ey = int(sl.cy + math.sin(arm_angle) * sl.length)
+                # Outer glow
+                draw.line([(scx, scy), (ex, ey)],
+                          fill=(255, 50, 50), width=int(sl.thickness + 8))
+                # Core beam
+                draw.line([(scx, scy), (ex, ey)],
+                          fill=sl.color, width=int(sl.thickness))
+                # Inner white
+                draw.line([(scx, scy), (ex, ey)],
+                          fill=(255, 200, 200),
+                          width=max(1, int(sl.thickness // 3)))
+            # Center hub
+            draw.ellipse([scx - 10, scy - 10, scx + 10, scy + 10],
+                         fill=(255, 100, 100), outline=(255, 255, 255), width=2)
+            cf = self._font(14)
+            draw.text((scx - 5, scy - 7), "⚡", font=cf)
+
+        # ── Death Walls ──
+        for dw in hazards.death_walls:
+            if dw.position <= 0:
+                continue
+            pos = int(dw.position)
+            if dw.side == "left":
+                draw.rectangle([ax1, ay1, ax1 + pos, ay2], fill=dw.color)
+                # Warning stripes
+                for sy_s in range(ay1, ay2, 20):
+                    draw.rectangle([ax1 + pos - 6, sy_s,
+                                    ax1 + pos, sy_s + 10],
+                                   fill=(255, 255, 0))
+            elif dw.side == "right":
+                draw.rectangle([ax2 - pos, ay1, ax2, ay2], fill=dw.color)
+                for sy_s in range(ay1, ay2, 20):
+                    draw.rectangle([ax2 - pos, sy_s,
+                                    ax2 - pos + 6, sy_s + 10],
+                                   fill=(255, 255, 0))
+            elif dw.side == "top":
+                draw.rectangle([ax1, ay1, ax2, ay1 + pos], fill=dw.color)
+                for sx_s in range(ax1, ax2, 20):
+                    draw.rectangle([sx_s, ay1 + pos - 6,
+                                    sx_s + 10, ay1 + pos],
+                                   fill=(255, 255, 0))
+            elif dw.side == "bottom":
+                draw.rectangle([ax1, ay2 - pos, ax2, ay2], fill=dw.color)
+                for sx_s in range(ax1, ax2, 20):
+                    draw.rectangle([sx_s, ay2 - pos,
+                                    sx_s + 10, ay2 - pos + 6],
+                                   fill=(255, 255, 0))
+
+        # ── Shockwaves ──
+        for sw in hazards.shockwaves:
+            cr_s = int(sw.current_radius)
+            if cr_s < 2:
+                continue
+            scx, scy = int(sw.cx), int(sw.cy)
+            th_s = max(2, int(sw.thickness))
+            # Outer ring
+            draw.ellipse([scx - cr_s, scy - cr_s, scx + cr_s, scy + cr_s],
+                         outline=sw.color, width=th_s)
+            # Inner bright ring
+            inner_r = max(1, cr_s - th_s // 2)
+            draw.ellipse([scx - inner_r, scy - inner_r,
+                          scx + inner_r, scy + inner_r],
+                         outline=(255, 255, 255), width=max(1, th_s // 3))
+
+        # ── Meteors ──
+        for m in hazards.meteors:
+            mtx, mty = int(m.target_x), int(m.target_y)
+            if not m.exploded:
+                # Warning circle on ground
+                wr = int(m.blast_radius)
+                # Pulsing warning
+                pulse_a = int(80 + 40 * math.sin(frame * 0.3))
+                draw.ellipse([mtx - wr, mty - wr, mtx + wr, mty + wr],
+                             outline=(255, 50, 50), width=2)
+                # X mark
+                draw.line([(mtx - 8, mty - 8), (mtx + 8, mty + 8)],
+                          fill=(255, 50, 50), width=2)
+                draw.line([(mtx - 8, mty + 8), (mtx + 8, mty - 8)],
+                          fill=(255, 50, 50), width=2)
+                # Meteor in the sky falling
+                mx = int(m.x)
+                my = int(m.current_y)
+                mr = int(m.radius)
+                if my > ay1 - 200:
+                    # Meteor body
+                    draw.ellipse([mx - mr, my - mr, mx + mr, my + mr],
+                                 fill=(180, 80, 0), outline=(255, 150, 50), width=2)
+                    # Fire trail above
+                    for t_i in range(5):
+                        ty_m = my - t_i * 8 - mr
+                        tr_m = max(1, mr - t_i * 2)
+                        tc = (255, max(0, 200 - t_i * 40), 0)
+                        draw.ellipse([mx - tr_m, ty_m - tr_m,
+                                      mx + tr_m, ty_m + tr_m], fill=tc)
+            else:
+                # Explosion
+                age = frame - m.explosion_frame
+                if age < 30:
+                    ep = age / 30.0
+                    er = int(m.blast_radius * min(1.0, ep * 2))
+                    alpha_f = 1.0 - ep
+                    exp_colors = [(255, 255, 200), (255, 180, 50), (255, 80, 0)]
+                    ci_e = min(len(exp_colors) - 1, int(ep * len(exp_colors)))
+                    ec = tuple(int(v * alpha_f) for v in exp_colors[ci_e])
+                    if er > 0:
+                        draw.ellipse([mtx - er, mty - er, mtx + er, mty + er],
+                                     fill=ec, outline=(255, 100, 0))
+
+        # ── Vortices ──
+        for v in hazards.vortices:
+            vx, vy = int(v.x), int(v.y)
+            vr = int(v.radius)
+            # Spiral rings
+            for ring in range(5, vr, 12):
+                c_v = (min(255, 80 + ring), 30, min(255, 180 + ring // 2))
+                for seg in range(16):
+                    a1 = v.rotation + seg * math.pi / 8 + ring * 0.06
+                    a2 = a1 + math.pi / 16
+                    x1_v = vx + int(math.cos(a1) * ring)
+                    y1_v = vy + int(math.sin(a1) * ring)
+                    x2_v = vx + int(math.cos(a2) * ring)
+                    y2_v = vy + int(math.sin(a2) * ring)
+                    draw.line([(x1_v, y1_v), (x2_v, y2_v)], fill=c_v, width=2)
+            # Kill zone center
+            kr = int(v.kill_radius)
+            draw.ellipse([vx - kr, vy - kr, vx + kr, vy + kr],
+                         fill=(50, 0, 100), outline=(200, 50, 255), width=2)
+            # Label
+            vf = self._font(14)
+            draw.text((vx - 5, vy - 7), "⚫", font=vf)
+
+    # ══════════════════════════════════════════════════════════════════════════
+    # PARTICLES
+    # ══════════════════════════════════════════════════════════════════════════
+    def _update_and_render_particles(self, draw: ImageDraw.Draw, frame: int):
+        surviving = []
+        for p in self._death_particles:
+            p["x"] += p["vx"]
+            p["y"] += p["vy"]
+            p["vy"] += 0.15
+            p["life"] -= 0.04
+            if p["life"] > 0:
+                sz = max(1, int(p["size"] * p["life"]))
+                c = tuple(max(0, int(v * p["life"])) for v in p["color"])
+                px, py = int(p["x"]), int(p["y"])
+                draw.ellipse([px - sz, py - sz, px + sz, py + sz], fill=c)
+                surviving.append(p)
+        self._death_particles = surviving
+
+    def _update_and_render_bubbles(self, draw: ImageDraw.Draw,
+                                    img: Image.Image, frame: int):
+        surviving = []
+        for b in self._bubble_particles:
+            b["x"] += b["vx"]
+            b["y"] += b["vy"]
+            b["vy"] -= 0.08
+            b["vx"] *= 0.98
+            b["vy"] *= 0.98
+            b["life"] -= b["decay"]
+            b["wobble_phase"] += b["wobble_speed"]
+            wobble = math.sin(b["wobble_phase"]) * 2.0
+            life = b["life"]
+            if life > 0.7:
+                cur_r = b["radius"] + (b["max_radius"] - b["radius"]) * (1.0 - life) / 0.3
+            elif life > 0:
+                cur_r = b["max_radius"] * (life / 0.7)
+            else:
+                cur_r = 0
+            if life > 0 and cur_r > 1:
+                bx_b = int(b["x"] + wobble)
+                by_b = int(b["y"])
+                cr = max(1, int(cur_r))
+                bc = b["color"]
+                bf = tuple(min(255, c + 40) for c in bc)
+                draw.ellipse([bx_b - cr, by_b - cr, bx_b + cr, by_b + cr],
+                             outline=bf, width=max(1, cr // 4))
+                hr = max(1, cr // 3)
+                hx, hy = bx_b - cr // 4, by_b - cr // 4
+                hc = tuple(min(255, c + 120) for c in bc)
+                draw.ellipse([hx - hr, hy - hr, hx + hr, hy + hr], fill=hc)
+                surviving.append(b)
+        self._bubble_particles = surviving
+
+    # ══════════════════════════════════════════════════════════════════════════
+    # ELIMINATION FEED
+    # ══════════════════════════════════════════════════════════════════════════
+    def _render_elimination_feed(self, draw: ImageDraw.Draw, frame: int):
+        self._elimination_feed = [(e, n, c) for e, n, c in
+                                   self._elimination_feed if e > frame]
+        if not self._elimination_feed:
+            return
+        ff = self._font(14)
+        xp = self.w - 210
+        yp = 180
+        for i, (exp, name, color) in enumerate(self._elimination_feed[-4:]):
+            remaining = exp - frame
+            af = min(1.0, remaining / 30.0)
+            draw.ellipse([xp, yp + i * 22, xp + 10, yp + i * 22 + 10],
+                         fill=color)
+            tc = tuple(int(200 * af) for _ in range(3))
+            draw.text((xp + 14, yp + i * 22 - 2), f"☠ {name[:12]}",
+                      font=ff, fill=tc)
+
+    # ══════════════════════════════════════════════════════════════════════════
+    # CHALLENGE BANNER
+    # ══════════════════════════════════════════════════════════════════════════
+    def _render_challenge_banner(self, draw: ImageDraw.Draw, frame: int):
+        if self._challenge_banner is None:
+            return
+        expire, name, emoji = self._challenge_banner
+        if frame > expire:
+            self._challenge_banner = None
+            return
+        remaining = expire - frame
+        total_dur = 90
+        if remaining > total_dur - 10:
+            slide = (total_dur - remaining) / 10.0
+        elif remaining < 15:
+            slide = remaining / 15.0
+        else:
+            slide = 1.0
+
+        w = self.w
+        bw_b = 500
+        bh_b = 70
+        bx_b = int((w - bw_b) / 2)
+        by_b = int(220 + (1.0 - slide) * 100)
+
+        draw.rounded_rectangle([bx_b, by_b, bx_b + bw_b, by_b + bh_b],
+                               radius=15, fill=(20, 20, 50))
+        draw.rounded_rectangle([bx_b, by_b, bx_b + bw_b, by_b + bh_b],
+                               radius=15, outline=(255, 200, 50), width=3)
+
+        hf = self._font(18)
+        self._outlined_text(draw, (bx_b + 15, by_b + 5),
+                            "⚡ NEW CHALLENGE! ⚡", hf,
+                            (255, 200, 50), outline_w=2)
+
+        nf = self._font(26)
+        ct = f"{emoji} {name} {emoji}"
+        bbox_c = draw.textbbox((0, 0), ct, font=nf)
+        tw_c = bbox_c[2] - bbox_c[0]
+        nx = bx_b + (bw_b - tw_c) // 2
+        self._outlined_text(draw, (nx, by_b + 34), ct, nf,
+                            (255, 255, 255), outline_w=3)
+
+    # ══════════════════════════════════════════════════════════════════════════
+    # HUD
+    # ══════════════════════════════════════════════════════════════════════════
+    def _render_hud(self, draw: ImageDraw.Draw, img: Image.Image,
+                    t: float, frame: int, alive: int, total: int,
+                    phase: str, winner: Optional[Ball],
+                    balls: List[Ball],
+                    selected_challenges: List[Dict],
+                    challenge_index: int):
+        w, h = self.w, self.h
+        if phase == "countdown":
+            return
+
+        # Title
+        tf = self._font(30)
+        title = "🔴 BRAINROT BATTLE ROYALE 🔴"
+        bbox_t = draw.textbbox((0, 0), title, font=tf)
+        tw_t = bbox_t[2] - bbox_t[0]
+        self._outlined_text(draw, ((w - tw_t) // 2, 12), title, tf,
+                            (255, 255, 255))
+
+        # Alive counter
+        cfs = 52
+        if alive <= 10:
+            p = 1.0 + 0.15 * math.sin(frame * 0.3)
+            cfs = int(52 * p)
+        cf = self._font(cfs)
+        ct = str(alive)
+        bbox_c = draw.textbbox((0, 0), ct, font=cf)
+        tw_c = bbox_c[2] - bbox_c[0]
+
+        if alive > 50:
+            cc = (100, 255, 100)
+        elif alive > 20:
+            cc = (255, 255, 100)
+        elif alive > 5:
+            cc = (255, 150, 50)
+        else:
+            cc = (255, 50, 50)
+
+        self._outlined_text(draw, ((w - tw_c) // 2, 52), ct, cf, cc, outline_w=4)
+
+        lf = self._font(22)
+        self._outlined_text(draw, ((w - 42) // 2, 108), "ALIVE", lf,
+                            (200, 200, 200))
+
+        # Timer
+        tmf = self._font(22)
+        self._outlined_text(draw, (w - 120, 12), f"⏱ {t:.1f}s", tmf,
+                            (200, 200, 200))
+
+        # Challenge sidebar
+        chf = self._font(13)
+        chf_h = self._font(15)
+        cx_ch, cy_ch = 8, 155
+        self._outlined_text(draw, (cx_ch, cy_ch), "CHALLENGES:", chf_h,
+                            (255, 200, 100), outline_w=2)
+        cy_ch += 20
+        for idx, ch in enumerate(selected_challenges):
+            if idx < challenge_index:
+                sc, prefix = (100, 100, 100), "✅"
+            elif idx == challenge_index:
+                sc, prefix = (255, 255, 50), "▶️"
+            else:
+                sc, prefix = (150, 150, 150), "⏳"
+            self._outlined_text(draw, (cx_ch, cy_ch),
+                                f"{prefix} {ch['emoji']} {ch['name'][:16]}",
+                                chf, sc, outline_w=1)
+            cy_ch += 18
+
+        # Event notifications
+        self._event_display = [(e, t_e) for e, t_e in self._event_display
+                                if e > frame]
+        y_off = 310
+        ef = self._font(26)
+        for _, txt in self._event_display[-3:]:
+            bbox_e = draw.textbbox((0, 0), txt, font=ef)
+            tw_e = bbox_e[2] - bbox_e[0]
+            self._outlined_text(draw, ((w - tw_e) // 2, y_off), txt,
+                                ef, (255, 220, 50), outline_w=3)
+            y_off += 34
+
+        # Progress bar
+        bar_x, bar_y = 30, h - 50
+        bar_w, bar_h_s = w - 60, 14
+        progress = min(1.0, t / self.config.duration)
+        draw.rounded_rectangle([bar_x, bar_y, bar_x + bar_w,
+                                bar_y + bar_h_s], radius=7, fill=(40, 40, 40))
+        fill_w = int(bar_w * (1.0 - progress))
+        if fill_w > 0:
+            for i_b in range(fill_w):
+                ratio = i_b / max(1, bar_w)
+                draw.line([(bar_x + i_b, bar_y + 1),
+                           (bar_x + i_b, bar_y + bar_h_s - 1)],
+                          fill=(int(50 + 205 * ratio),
+                                int(255 * (1.0 - ratio)), 50))
+
+        bf = self._font(13)
+        self._outlined_text(draw, (bar_x, bar_y - 16), "ARENA SIZE",
+                            bf, (180, 180, 180), outline_w=2)
+
+        # Engagement hooks
+        pp = progress
+        if 0.30 < pp < 0.34 and alive > 30:
+            hf = self._font(34)
+            hook = "WHO WILL SURVIVE? 🤔"
+            bbox_h = draw.textbbox((0, 0), hook, font=hf)
+            self._outlined_text(draw, ((w - bbox_h[2] + bbox_h[0]) // 2, h // 2 - 30),
+                                hook, hf, (255, 224, 0), outline_w=4)
+        if 0.55 < pp < 0.59 and alive > 10:
+            hf = self._font(32)
+            hook = "¿QUIÉN SOBREVIVE? 🔥"
+            bbox_h = draw.textbbox((0, 0), hook, font=hf)
+            self._outlined_text(draw, ((w - bbox_h[2] + bbox_h[0]) // 2, h // 2 - 30),
+                                hook, hf, (255, 150, 50), outline_w=4)
+        if 0.78 < pp < 0.82 and alive > 3:
+            hf = self._font(36)
+            hook = "FINAL SHOWDOWN! ⚔️"
+            bbox_h = draw.textbbox((0, 0), hook, font=hf)
+            self._outlined_text(draw, ((w - bbox_h[2] + bbox_h[0]) // 2, h // 2 - 30),
+                                hook, hf, (255, 50, 50), outline_w=4)
+
+        # Subscribe button
+        if frame % 350 < 160 and phase == "racing":
+            sf = self._font(20)
+            st = "👆 SUBSCRIBE 👆"
+            bbox_s = draw.textbbox((0, 0), st, font=sf)
+            tw_s = bbox_s[2] - bbox_s[0]
+            sx = (w - tw_s) // 2
+            sy = h - 78
+            draw.rounded_rectangle([sx - 8, sy - 4, sx + tw_s + 8, sy + 26],
+                                   radius=8, fill=(220, 0, 0))
+            draw.text((sx, sy), st, font=sf, fill=(255, 255, 255))
+
+        # Milestone alerts
+        if alive == 10:
+            af = self._font(38)
+            at = "🔥 TOP 10! 🔥"
+            bbox_a = draw.textbbox((0, 0), at, font=af)
+            self._outlined_text(draw, ((w - bbox_a[2] + bbox_a[0]) // 2, 140),
+                                at, af, (255, 100, 50), outline_w=4)
+        if alive == 5:
+            af = self._font(42)
+            at = "⚡ FINAL 5! ⚡"
+            bbox_a = draw.textbbox((0, 0), at, font=af)
+            self._outlined_text(draw, ((w - bbox_a[2] + bbox_a[0]) // 2, 140),
+                                at, af, (255, 50, 255), outline_w=4)
+        if alive == 2:
+            af = self._font(46)
+            at = "💀 1v1 FINAL! 💀"
+            bbox_a = draw.textbbox((0, 0), at, font=af)
+            self._outlined_text(draw, ((w - bbox_a[2] + bbox_a[0]) // 2, 140),
+                                at, af, (255, 0, 0), outline_w=5)
+
+    # ══════════════════════════════════════════════════════════════════════════
+    # COUNTDOWN
+    # ══════════════════════════════════════════════════════════════════════════
+    def _render_countdown(self, draw: ImageDraw.Draw, t: float):
+        w, h = self.w, self.h
+        if t < 1.0:
+            txt, col = "3", (255, 100, 100)
+        elif t < 2.0:
+            txt, col = "2", (255, 200, 100)
+        elif t < 3.0:
+            txt, col = "1", (100, 255, 100)
+        else:
+            txt, col = "GO!", (50, 255, 50)
+
+        sub_t = t % 1.0
+        scale = 1.0 + 0.4 * (1.0 - sub_t)
+        fs = int(140 * scale)
+        f = self._font(fs)
+        bbox = draw.textbbox((0, 0), txt, font=f)
+        tw, th_t = bbox[2] - bbox[0], bbox[3] - bbox[1]
+        self._outlined_text(draw, ((w - tw) // 2, (h - th_t) // 2 - 120),
+                            txt, f, col, outline_w=5)
+
+        sf = self._font(28)
+        st = "💀 100 BRAINROT BALLS • 1 SURVIVES 💀"
+        bbox_s = draw.textbbox((0, 0), st, font=sf)
+        self._outlined_text(draw, ((w - bbox_s[2] + bbox_s[0]) // 2, h // 2 + 40),
+                            st, sf, (255, 255, 255), outline_w=3)
+
+        sf2 = self._font(20)
+        st2 = "🎲 7 RANDOM CHALLENGES THIS ROUND 🎲"
+        bbox_s2 = draw.textbbox((0, 0), st2, font=sf2)
+        self._outlined_text(draw, ((w - bbox_s2[2] + bbox_s2[0]) // 2, h // 2 + 82),
+                            st2, sf2, (255, 200, 100), outline_w=2)
+
+    # ══════════════════════════════════════════════════════════════════════════
+    # WINNER SCREEN
+    # ══════════════════════════════════════════════════════════════════════════
+    def _render_winner_screen(self, img: Image.Image, draw: ImageDraw.Draw,
+                               winner: Ball, t: float, frame: int) -> Image.Image:
+        w, h = self.w, self.h
+
+        # Dark overlay
+        overlay = Image.new("RGBA", (w, h), (0, 0, 0, 140))
+        img = img.convert("RGBA")
+        img = Image.alpha_composite(img, overlay)
+        img = img.convert("RGB")
+        draw = ImageDraw.Draw(img)
+
+        # Rainbow border
+        hue_w = (frame * 0.03) % 1.0
+        rc, gc, bc = [int(c * 255) for c in colorsys.hsv_to_rgb(hue_w, 1.0, 1.0)]
+        draw.rectangle([0, 0, w, h], outline=(rc, gc, bc), width=8)
+
+        # Confetti
+        conf_rng = random.Random(42)
+        for _ in range(100):
+            cx_c = conf_rng.randint(0, w)
+            cy_c = (conf_rng.randint(0, h) + frame * 3) % h
+            cs = conf_rng.randint(5, 16)
+            cc = (conf_rng.randint(100, 255), conf_rng.randint(100, 255),
+                  conf_rng.randint(100, 255))
+            if conf_rng.random() < 0.5:
+                draw.rectangle([cx_c, cy_c, cx_c + cs, cy_c + cs // 2], fill=cc)
+            else:
+                draw.ellipse([cx_c, cy_c, cx_c + cs, cy_c + cs], fill=cc)
+
+        # "WINNER" text
+        wf = self._font(72)
+        wt = "🏆 WINNER! 🏆"
+        bbox_w = draw.textbbox((0, 0), wt, font=wf)
+        tw_w = bbox_w[2] - bbox_w[0]
+        self._outlined_text(draw, ((w - tw_w) // 2, h // 4 - 20),
+                            wt, wf, (255, 220, 50), outline_w=5)
+
+        # Big winner ball
+        big_r = 60
+        cx_w = w // 2
+        cy_w = h // 2
+        bounce = int(abs(math.sin(frame * 0.15)) * 25)
+        cy_w -= bounce
+
+        # Glow rings
+        for gr_i in range(big_r + 35, big_r, -3):
+            draw.ellipse([cx_w - gr_i, cy_w - gr_i, cx_w + gr_i, cy_w + gr_i],
+                         fill=winner.color)
+
+        draw.ellipse([cx_w - big_r, cy_w - big_r, cx_w + big_r, cy_w + big_r],
+                     fill=winner.color, outline=(255, 255, 255), width=4)
+
+        # Winner character image
+        char_img = self._character_images.get(winner.name)
+        if char_img is not None:
+            icon_big = char_img.resize((big_r, big_r), Image.LANCZOS)
+            mask = Image.new("L", (big_r, big_r), 0)
+            mask_draw = ImageDraw.Draw(mask)
+            mask_draw.ellipse([0, 0, big_r - 1, big_r - 1], fill=255)
+            px_w = cx_w - big_r // 2
+            py_w = cy_w - big_r // 2
+            try:
+                img.paste(icon_big, (px_w, py_w), mask)
+            except Exception:
+                pass
+        draw = ImageDraw.Draw(img)
+
+        # Winner name
+        nf = self._font(40)
+        nt = f"{winner.emoji} {winner.name} {winner.emoji}"
+        bbox_n = draw.textbbox((0, 0), nt, font=nf)
+        tw_n = bbox_n[2] - bbox_n[0]
+        self._outlined_text(draw, ((w - tw_n) // 2, cy_w + big_r + 35),
+                            nt, nf, winner.color, outline_w=4)
+
+        # Subtitle
+        sf = self._font(28)
+        st = "💪 LAST BALL STANDING! 💪"
+        bbox_s = draw.textbbox((0, 0), st, font=sf)
+        tw_s = bbox_s[2] - bbox_s[0]
+        self._outlined_text(draw, ((w - tw_s) // 2, cy_w + big_r + 85),
+                            st, sf, (255, 255, 255), outline_w=3)
+
+        # Engagement hooks
+        hf = self._font(24)
+        ht1 = "Did you guess right? Comment below! 👇"
+        bbox_h1 = draw.textbbox((0, 0), ht1, font=hf)
+        self._outlined_text(draw, ((w - bbox_h1[2] + bbox_h1[0]) // 2, h - 170),
+                            ht1, hf, (255, 200, 100), outline_w=3)
+
+        hf2 = self._font(22)
+        ht2 = "¿Adivinaste? Comenta tu favorito 👇"
+        bbox_h2 = draw.textbbox((0, 0), ht2, font=hf2)
+        self._outlined_text(draw, ((w - bbox_h2[2] + bbox_h2[0]) // 2, h - 140),
+                            ht2, hf2, (255, 180, 80), outline_w=2)
+
+        return img
+
+print("✅ Renderer ready.")
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 11 — AUDIO GENERATOR
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class AudioGenerator:
+    def __init__(self, config: Config):
+        self.config = config
+        self.temp_dir = os.path.join(config.output_dir, "temp_audio")
+        os.makedirs(self.temp_dir, exist_ok=True)
+
+    def generate(self, total_duration: float, winner_name: str,
+                 countdown_dur: float,
+                 death_times: List[float],
+                 challenge_times: List[float]) -> Optional[str]:
+        sr = 44100
+        total_samples = int(total_duration * sr)
+        audio = np.zeros(total_samples, dtype=np.float64)
+        rng_audio = np.random.default_rng(hash(self.config.seed) % (2**31))
+
+        # Countdown beeps
+        for bt in [0.0, 1.0, 2.0]:
+            self._add_beep(audio, sr, bt, freq=330, dur_ms=120, vol=0.5)
+        go_time = countdown_dur - 0.15
+        self._add_beep(audio, sr, go_time, freq=660, dur_ms=250, vol=0.6)
+        self._add_beep(audio, sr, go_time, freq=830, dur_ms=250, vol=0.35)
+
+        # Racing beat
+        race_start = int(countdown_dur * sr)
+        race_end = int((total_duration - 6.0) * sr)
+        race_end = min(race_end, total_samples)
+        bpm = 148
+        beat_samples = int(60.0 / bpm * sr)
+        half_beat = beat_samples // 2
+
+        kick_len = int(0.10 * sr)
+        kick_t = np.arange(kick_len, dtype=np.float64) / sr
+        kick = np.sin(2 * np.pi * 65 * kick_t) * np.exp(-kick_t * 35) * 0.4
+
+        snare_len = int(0.05 * sr)
+        snare_t = np.arange(snare_len, dtype=np.float64) / sr
+        snare = rng_audio.standard_normal(snare_len) * np.exp(-snare_t * 45) * 0.15
+
+        hh_len = int(0.02 * sr)
+        hh = rng_audio.standard_normal(hh_len) * np.exp(
+        -np.arange(hh_len, dtype=np.float64) / sr * 90) * 0.04
+
+        bass_freqs = [131.0, 165.0, 196.0, 131.0]
+        bass_dur = int(beat_samples * 0.75)
+        bass_t_arr = np.arange(bass_dur, dtype=np.float64) / sr
+        bass_env = np.exp(-bass_t_arr * 7)
+
+        mel_notes = [523, 659, 784, 659, 523, 587, 659, 523]
+        mel_dur = half_beat
+        mel_t_arr = np.arange(mel_dur, dtype=np.float64) / sr
+        mel_fade = max(1, mel_dur // 8)
+        mel_env = np.ones(mel_dur, dtype=np.float64)
+        mel_env[:mel_fade] = np.linspace(0, 1, mel_fade)
+        mel_env[-mel_fade:] = np.linspace(1, 0, mel_fade)
+        mel_env *= np.exp(-mel_t_arr * 5)
+
+        num_beats = (race_end - race_start) // beat_samples + 1
+        mel_idx = 0
+
+        for i_beat in range(num_beats):
+            pos = race_start + i_beat * beat_samples
+            self._safe_add(audio, pos, kick, total_samples)
+            if i_beat % 4 in (1, 3):
+                self._safe_add(audio, pos, snare, total_samples)
+            for off in (0, half_beat):
+                self._safe_add(audio, pos + off, hh, total_samples)
+            note_freq = bass_freqs[i_beat % len(bass_freqs)]
+            bass_wave = np.sin(2 * np.pi * note_freq * bass_t_arr) * bass_env * 0.12
+            self._safe_add(audio, pos, bass_wave, total_samples)
+            for m_off in (0, half_beat):
+                mel_freq = mel_notes[mel_idx % len(mel_notes)]
+                mel_wave = (np.sin(2 * np.pi * mel_freq * mel_t_arr) +
+                            np.sin(2 * np.pi * mel_freq * 3 * mel_t_arr) * 0.25
+                            ) * mel_env * 0.055
+                self._safe_add(audio, pos + m_off, mel_wave, total_samples)
+                mel_idx += 1
+
+        # Death SFX
+        death_thud_len = int(0.08 * sr)
+        death_thud_t = np.arange(death_thud_len, dtype=np.float64) / sr
+        death_thud = np.sin(2 * np.pi * 45 * death_thud_t) * np.exp(-death_thud_t * 25) * 0.3
+
+        pop_len = int(0.06 * sr)
+        pop_t = np.arange(pop_len, dtype=np.float64) / sr
+        pop_freq_sweep = 800 - pop_t * 8000
+        pop_phase = np.cumsum(pop_freq_sweep / sr) * 2 * np.pi
+        pop_sound = np.sin(pop_phase) * np.exp(-pop_t * 40) * 0.15
+
+        for dt_time in death_times:
+            sample_pos = int(dt_time * sr)
+            self._safe_add(audio, sample_pos, death_thud, total_samples)
+            self._safe_add(audio, sample_pos + int(0.02 * sr), pop_sound, total_samples)
+
+        # Challenge announcement sounds
+        challenge_fanfare_len = int(0.3 * sr)
+        challenge_fanfare_t = np.arange(challenge_fanfare_len, dtype=np.float64) / sr
+        challenge_fanfare = (
+            np.sin(2 * np.pi * 440 * challenge_fanfare_t) * 0.15 +
+            np.sin(2 * np.pi * 554 * challenge_fanfare_t) * 0.12 +
+            np.sin(2 * np.pi * 659 * challenge_fanfare_t) * 0.10
+        )
+        fanfare_env = np.ones(challenge_fanfare_len, dtype=np.float64)
+        fanfare_fade = max(1, challenge_fanfare_len // 4)
+        fanfare_env[-fanfare_fade:] = np.linspace(1, 0, fanfare_fade)
+        challenge_fanfare *= fanfare_env
+
+        for ct_time in challenge_times:
+            sample_pos = int(ct_time * sr)
+            self._safe_add(audio, sample_pos, challenge_fanfare, total_samples)
+
+        # Rising tension last 25%
+        tension_start = race_start + int((race_end - race_start) * 0.75)
+        tension_len = race_end - tension_start
+        if tension_len > 0:
+            ten_t = np.arange(tension_len, dtype=np.float64) / sr
+            progress_t = np.linspace(0.0, 1.0, tension_len)
+            freq_sweep = 200.0 + progress_t * 800.0
+            phase_sweep = np.cumsum(freq_sweep / sr) * 2 * np.pi
+            tension_wave = np.sin(phase_sweep) * progress_t * 0.04
+            self._safe_add(audio, tension_start, tension_wave, total_samples)
+
+        # Winner celebration
+        celeb_start = race_end
+        celeb_len = total_samples - celeb_start
+        if celeb_len > 0:
+            celeb_t = np.arange(celeb_len, dtype=np.float64) / sr
+            victory = (
+                np.sin(2 * np.pi * 261.63 * celeb_t) * 0.18 +
+                np.sin(2 * np.pi * 329.63 * celeb_t) * 0.15 +
+                np.sin(2 * np.pi * 392.00 * celeb_t) * 0.13 +
+                np.sin(2 * np.pi * 493.88 * celeb_t) * 0.10
+            )
+            chord_env = np.exp(-celeb_t * 0.5)
+            self._safe_add(audio, celeb_start, victory * chord_env, total_samples)
+
+            sparkle_offsets = [0.05, 0.25, 0.55, 0.85, 1.15, 1.45]
+            sparkle_freqs_list = [
+                (1200, 800), (1000, 600), (1100, 700),
+                (1300, 900), (1150, 750), (1050, 650),
+            ]
+            spark_dur = int(0.15 * sr)
+            for sp_off, (sf1, sf2) in zip(sparkle_offsets, sparkle_freqs_list):
+                sp_start = celeb_start + int(sp_off * sr)
+                sp_actual = min(spark_dur, total_samples - sp_start)
+                if sp_actual > 0:
+                    sp_t = np.arange(sp_actual, dtype=np.float64) / sr
+                    sp_prog = np.linspace(0, 1, sp_actual)
+                    sp_freq = sf1 - sp_prog * (sf1 - sf2)
+                    sp_phase = np.cumsum(sp_freq / sr) * 2 * np.pi
+                    sp_env = np.exp(-sp_t * 12)
+                    self._safe_add(audio, sp_start,
+                                   np.sin(sp_phase) * sp_env * 0.10, total_samples)
+
+            cheer_len = min(celeb_len, int(3.0 * sr))
+            cheer_noise = rng_audio.standard_normal(cheer_len)
+            cheer_t_arr = np.arange(cheer_len, dtype=np.float64) / sr
+            attack = min(int(0.1 * sr), cheer_len)
+            cheer_env = np.exp(-cheer_t_arr * 0.6)
+            if attack > 0:
+                cheer_env[:attack] = np.linspace(0, 1, attack)
+            self._safe_add(audio, celeb_start,
+                           cheer_noise * cheer_env * 0.05, total_samples)
+
+        # Winner TTS
+        tts_path = self._generate_tts(winner_name)
+        if tts_path and os.path.exists(tts_path):
+            try:
+                tts_seg = AudioSegment.from_file(tts_path)
+                tts_samples = np.array(tts_seg.get_array_of_samples(),
+                                       dtype=np.float64)
+                if tts_seg.channels == 2:
+                    tts_samples = tts_samples[::2]
+                tts_samples = tts_samples / 32768.0 * 0.75
+
+                if tts_seg.frame_rate != sr:
+                    ratio_tts = sr / tts_seg.frame_rate
+                    new_len_tts = int(len(tts_samples) * ratio_tts)
+                    tts_samples = np.interp(
+                        np.linspace(0, len(tts_samples) - 1, new_len_tts),
+                        np.arange(len(tts_samples)), tts_samples)
+
+                tts_start = celeb_start + int(0.8 * sr)
+                tts_end = min(tts_start + len(tts_samples), total_samples)
+                actual_tts = tts_end - tts_start
+                if actual_tts > 0:
+                    audio[tts_start:tts_end] += tts_samples[:actual_tts]
+            except Exception as e:
+                print(f"⚠️ TTS load failed: {e}")
+
+        # Normalize
+        max_val = np.max(np.abs(audio))
+        if max_val > 0:
+            audio = audio / max_val * 0.80
+
+        audio_int16 = (audio * 32767).astype(np.int16)
+
+        audio_path = os.path.join(self.temp_dir, "battle_audio.wav")
+        with wave_mod.open(audio_path, 'w') as wf:
+            wf.setnchannels(1)
+            wf.setsampwidth(2)
+            wf.setframerate(sr)
+            wf.writeframes(audio_int16.tobytes())
+
+        print(f"✅ Audio generated: {audio_path}")
+        return audio_path
+
+    def _add_beep(self, audio: np.ndarray, sr: int, time_s: float,
+                  freq: float = 440, dur_ms: int = 150, vol: float = 0.5):
+        n = int(sr * dur_ms / 1000.0)
+        t = np.arange(n, dtype=np.float64) / sr
+        wave = np.sin(2 * np.pi * freq * t) * vol
+        fade = max(1, int(n * 0.1))
+        env = np.ones(n, dtype=np.float64)
+        env[:fade] = np.linspace(0, 1, fade)
+        env[-fade:] = np.linspace(1, 0, fade)
+        wave *= env
+        self._safe_add(audio, int(time_s * sr), wave, len(audio))
+
+    @staticmethod
+    def _safe_add(audio: np.ndarray, start: int, data: np.ndarray, total: int):
+        if start < 0:
+            return
+        end = min(start + len(data), total)
+        actual = end - start
+        if actual > 0:
+            audio[start:end] += data[:actual]
+
+    def _generate_tts(self, name: str) -> Optional[str]:
+        try:
+            tts = gTTS(text=f"{name} wins! Last ball standing!", lang='en',
+                       slow=False)
+            path = os.path.join(self.temp_dir, "winner_tts.mp3")
+            tts.save(path)
+            return path
+        except Exception as e:
+            print(f"⚠️ TTS failed: {e}")
+            return None
+
+    def cleanup(self):
+        for f in glob.glob(os.path.join(self.temp_dir, "*")):
+            try:
+                os.remove(f)
+            except OSError:
+                pass
+
+print("✅ Audio generator ready.")
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 12 — GAME ORCHESTRATOR (MASTER CLASS)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class BallBattleRoyale:
+    def __init__(self, config: Optional[Config] = None):
+        self.config = config or Config()
+        self.rng = random.Random(self.config.seed)
+        print(f"🎲 Seed: {self.config.seed}")
+
+    def run(self) -> str:
+        config = self.config
+        fps = config.fps
+        total_frames = int(config.duration * fps)
+        countdown_dur = 3.5
+        countdown_frames = int(countdown_dur * fps)
+        winner_dur = 6.0
+
+        print(f"\n{'=' * 60}")
+        print(f"  🔴 BRAINROT BATTLE ROYALE")
+        print(f"  Duration: {config.duration}s | FPS: {fps} | Frames: {total_frames}")
+        print(f"{'=' * 60}\n")
+
+        # ── Download character images ──
+        char_pool = list(BRAINROT_CHARACTERS)
+        self.rng.shuffle(char_pool)
+        while len(char_pool) < config.num_balls:
+            extra = list(BRAINROT_CHARACTERS)
+            self.rng.shuffle(extra)
+            char_pool.extend(extra)
+        assigned_chars = char_pool[:config.num_balls]
+
+        all_used_chars = list({c["name"]: c for c in assigned_chars}.values())
+        character_images = download_character_images(
+            all_used_chars, config.image_cache_dir, icon_size=64)
+
+        # ── Select challenges ──
+        available_categories: Set[str] = set()
+        selected_challenges: List[Dict] = []
+        pool = list(ALL_CHALLENGES)
+        self.rng.shuffle(pool)
+
+        for ch in pool:
+            if ch["category"] not in available_categories:
+                selected_challenges.append(ch)
+                available_categories.add(ch["category"])
+            if len(selected_challenges) >= config.challenges_per_game:
+                break
+
+        if len(selected_challenges) < config.challenges_per_game:
+            remaining = [c for c in pool if c not in selected_challenges]
+            for c in remaining:
+                selected_challenges.append(c)
+                if len(selected_challenges) >= config.challenges_per_game:
+                    break
+
+        self.rng.shuffle(selected_challenges)
+
+        print("🎯 Selected challenges:")
+        for i, ch in enumerate(selected_challenges):
+            print(f"   {i + 1}. {ch['emoji']} {ch['name']}")
+
+        # ── Create balls ──
+        print(f"\n🔵 Creating {config.num_balls} brainrot balls...")
+        colors = generate_vibrant_colors(config.num_balls, self.rng)
+
+        physics = PhysicsEngine(config)
+        arena_init = physics.get_arena(countdown_dur)
+        ax1, ay1, ax2, ay2 = arena_init
+
+        balls: List[Ball] = []
+        cols, rows = 10, 10
+        for i in range(config.num_balls):
+            col = i % cols
+            row = i // cols
+            margin = config.ball_radius * 2.5
+            x = ax1 + margin + col * ((ax2 - ax1 - 2 * margin) / max(1, cols - 1))
+            y = ay1 + margin + row * ((ay2 - ay1 - 2 * margin) / max(1, rows - 1))
+            balls.append(Ball(i, x, y, config.ball_radius, colors[i],
+                              self.rng, assigned_chars[i]))
+
+        # ── Init systems ──
+        hazards = HazardManager(config, self.rng)
+        renderer = Renderer(config, character_images)
+
+        # ── Pre-simulate ──
+        print("⚙️ Pre-simulating game...")
+
+        frame_data: List[Dict] = []
+        winner: Optional[Ball] = None
+        forced_kill_timer = 0
+        death_times: List[float] = []
+        challenge_times: List[float] = []
+
+        # Schedule challenges
+        race_duration = config.duration - countdown_dur - winner_dur
+        interval = race_duration / max(1, len(selected_challenges))
+        challenge_schedule: List[Tuple[float, int]] = []
+        for idx_s, ch in enumerate(selected_challenges):
+            act_time = countdown_dur + interval * idx_s + self.rng.uniform(1, 3)
+            act_time = min(act_time, config.duration - winner_dur - 2)
+            challenge_schedule.append((act_time, idx_s))
+        challenge_schedule.sort(key=lambda x: x[0])
+        next_challenge_ptr = 0
+        current_challenge_index = 0
+
+        original_bounce = config.bounce_damping
+        original_margin = config.arena_margin_end
+
+        for frame in range(total_frames):
+            t = frame / fps
+
+            if t < countdown_dur:
+                phase = "countdown"
+            elif winner is not None:
+                phase = "winner"
+            else:
+                phase = "racing"
+
+            arena = physics.get_arena(t)
+
+            if phase == "racing":
+                # ── Activate challenges ──
+                while (next_challenge_ptr < len(challenge_schedule) and
+                       t >= challenge_schedule[next_challenge_ptr][0]):
+                    sched_time, sched_idx = challenge_schedule[next_challenge_ptr]
+                    ch = selected_challenges[sched_idx]
+                    current_challenge_index = sched_idx + 1
+
+                    try:
+                        ch["apply"](
+                            balls=balls, arena=arena, hazards=hazards,
+                            rng=self.rng, config=config,
+                            frame=frame, renderer=renderer,
+                        )
+                    except Exception as e:
+                        print(f"⚠️ Challenge '{ch['name']}' error: {e}")
+
+                    renderer.set_challenge_banner(frame, ch["name"], ch["emoji"])
+                    renderer.add_event_text(frame, f"{ch['emoji']} {ch['name']}!", 60)
+                    renderer.trigger_screen_shake(8.0)
+                    challenge_times.append(t)
+                    print(f"  ⚡ {ch['emoji']} {ch['name']} at t={t:.1f}s")
+                    next_challenge_ptr += 1
+
+                # ── Update hazards ──
+                hazards.update(t, frame, arena)
+
+                # ── Update physics ──
+                physics.update_balls(balls, arena, hazards, frame)
+
+                # ── Check deaths (NATURAL — from visible hazards) ──
+                forced_kill_timer += 1
+                for ball in [b for b in balls if b.alive]:
+                    if hazards.check_ball_death(ball, frame, arena):
+                        ball.alive = False
+                        ball.death_frame = frame
+                        renderer.add_death_particles(ball.x, ball.y, ball.color, frame)
+                        renderer.add_bubble_explosion(ball.x, ball.y, ball.color, frame)
+                        renderer.add_elimination(frame, ball.name, ball.color)
+                        death_times.append(t)
+                        forced_kill_timer = 0
+
+                # ── Pacing: only force kills if WAY too many alive late game ──
+                alive_now = sum(1 for b in balls if b.alive)
+                race_progress = max(0.001, (t - countdown_dur) / race_duration)
+
+                # Soft pacing: if we're past 70% and still >30 alive, add hazards
+                if race_progress > 0.7 and alive_now > 30 and forced_kill_timer > fps * 4:
+                    ax1_a, ay1_a, ax2_a, ay2_a = arena
+                    angle_f = self.rng.uniform(0, 2 * math.pi)
+                    hazards.fireballs.append(Fireball(
+                        x=(ax1_a + ax2_a) / 2, y=(ay1_a + ay2_a) / 2,
+                        vx=math.cos(angle_f) * 5, vy=math.sin(angle_f) * 5,
+                        radius=20, lifetime=15))
+                    forced_kill_timer = 0
+
+                # Hard pacing: only if >80% through and >20 alive
+                if race_progress > 0.8 and alive_now > 20 and forced_kill_timer > fps * 5:
+                    candidates = sorted(
+                        [b for b in balls if b.alive],
+                        key=lambda b: self._danger_score(b, arena, hazards),
+                        reverse=True)
+                    if len(candidates) > 1:
+                        victim = candidates[0]
+                        victim.alive = False
+                        victim.death_frame = frame
+                        renderer.add_death_particles(victim.x, victim.y, victim.color, frame)
+                        renderer.add_bubble_explosion(victim.x, victim.y, victim.color, frame)
+                        renderer.add_elimination(frame, victim.name, victim.color)
+                        death_times.append(t)
+                        forced_kill_timer = 0
+
+                # ── Check winner ──
+                alive_now = sum(1 for b in balls if b.alive)
+                if alive_now <= 1 and winner is None:
+                    alive_list = [b for b in balls if b.alive]
+                    if alive_list:
+                        winner = alive_list[0]
+                    else:
+                        last_dead = max(balls, key=lambda b: b.death_frame)
+                        last_dead.alive = True
+                        winner = last_dead
+                    print(f"🏆 WINNER: {winner.emoji} {winner.name} at t={t:.1f}s")
+
+                alive_count = sum(1 for b in balls if b.alive)
+            elif phase == "countdown":
+                alive_count = config.num_balls
+            else:
+                alive_count = 1
+
+            # ── Store snapshot ──
+            snapshot = {
+                "t": t, "frame": frame, "phase": phase,
+                "arena": arena, "alive_count": alive_count,
+                "challenge_index": current_challenge_index,
+                "ball_states": [],
+            }
+            for b in balls:
+                snapshot["ball_states"].append({
+                    "id": b.id, "x": b.x, "y": b.y,
+                    "vx": b.vx, "vy": b.vy,
+                    "alive": b.alive, "color": b.color,
+                    "accent": b.accent, "outline_color": b.outline_color,
+                    "trail": list(b.trail),
+                    "invincible_timer": b.invincible_timer,
+                    "radius": b.radius,
+                })
+            frame_data.append(snapshot)
+
+            if frame % (fps * 5) == 0:
+                print(f"  Frame {frame}/{total_frames} | t={t:.1f}s | alive={alive_count}")
+
+        if winner is None:
+            alive_list = [b for b in balls if b.alive]
+            if alive_list:
+                winner = alive_list[0]
+            else:
+                winner = max(balls, key=lambda b: b.death_frame)
+                winner.alive = True
+            print(f"🏆 WINNER (time limit): {winner.emoji} {winner.name}")
+
+        print(f"\n✅ Simulation: {len(frame_data)} frames, {len(death_times)} deaths")
+        gc.collect()
+
+        config.bounce_damping = original_bounce
+        config.arena_margin_end = original_margin
+
+        # ── Audio ──
+        print("🔊 Generating audio...")
+        audio_gen = AudioGenerator(config)
+        audio_path = audio_gen.generate(
+            config.duration, winner.name, countdown_dur,
+            death_times, challenge_times)
+
+        # ── Encode video ──
+        print("🎬 Encoding video...")
+
+        frame_cache: Dict[int, np.ndarray] = {}
+        cache_limit = 3
+
+        def make_frame(t_sec: float) -> np.ndarray:
+            f_idx = min(int(t_sec * fps), len(frame_data) - 1)
+
+            if f_idx in frame_cache:
+                return frame_cache[f_idx]
+
+            snap = frame_data[f_idx]
+
+            for i_b, bs in enumerate(snap["ball_states"]):
+                balls[i_b].x = bs["x"]
+                balls[i_b].y = bs["y"]
+                balls[i_b].vx = bs["vx"]
+                balls[i_b].vy = bs["vy"]
+                balls[i_b].alive = bs["alive"]
+                balls[i_b].trail = bs["trail"]
+                balls[i_b].invincible_timer = bs["invincible_timer"]
+                balls[i_b].radius = bs["radius"]
+
+            rendered = renderer.render_frame(
+                snap["t"], snap["frame"], balls,
+                snap["arena"], hazards,
+                snap["alive_count"], config.num_balls,
+                winner if snap["phase"] == "winner" else None,
+                snap["phase"],
+                selected_challenges,
+                snap["challenge_index"],
+            )
+
+            frame_cache[f_idx] = rendered
+            if len(frame_cache) > cache_limit:
+                oldest = min(frame_cache.keys())
+                del frame_cache[oldest]
+
+            if f_idx % 100 == 0 and f_idx > 0:
+                gc.collect()
+
+            return rendered
+
+        timestamp = time.strftime("%Y%m%d_%H%M%S")
+        rand_suffix = ''.join(random.choices('abcdefghijklmnopqrstuvwxyz0123456789', k=4))
+        output_path = os.path.join(config.output_dir,
+                                    f"brainrot_battle_{timestamp}_{rand_suffix}.mp4")
+
+        video_clip = VideoClip(make_frame, duration=config.duration).set_fps(fps)
+
+        if audio_path and os.path.exists(audio_path):
+            try:
+                audio_clip = AudioFileClip(audio_path)
+                if audio_clip.duration > config.duration:
+                    audio_clip = audio_clip.subclip(0, config.duration)
+                video_clip = video_clip.set_audio(audio_clip)
+                print("✅ Audio attached.")
+            except Exception as e:
+                print(f"⚠️ Audio attach failed: {e}")
+
+        video_clip.write_videofile(
+            output_path, fps=fps, codec="libx264",
+            bitrate=config.bitrate, audio_codec="aac",
+            logger=None, threads=4)
+        video_clip.close()
+
+        file_mb = os.path.getsize(output_path) / (1024 * 1024)
+        print(f"\n✅ Video saved: {output_path} ({file_mb:.1f} MB)")
+
+        audio_gen.cleanup()
+        frame_cache.clear()
+        gc.collect()
+
+        return output_path
+
+    @staticmethod
+    def _danger_score(ball: Ball, arena: Tuple[int, int, int, int],
+                      hazards: HazardManager) -> float:
+        ax1, ay1, ax2, ay2 = arena
+        score = 0.0
+        score += max(0, 30 - (ball.x - ax1)) * 2
+        score += max(0, 30 - (ax2 - ball.x)) * 2
+        score += max(0, 30 - (ball.y - ay1)) * 2
+        score += max(0, 30 - (ay2 - ball.y)) * 2
+        for sp in hazards.spikes:
+            d = math.hypot(ball.x - sp.x, ball.y - sp.y)
+            if d < sp.radius * 3:
+                score += (sp.radius * 3 - d)
+        for fb in hazards.fireballs:
+            d = math.hypot(ball.x - fb.x, ball.y - fb.y)
+            if d < 80:
+                score += (80 - d) * 2
+        for v in hazards.vortices:
+            d = math.hypot(ball.x - v.x, ball.y - v.y)
+            if d < v.radius:
+                score += (v.radius - d) * 2
+        for lz in hazards.lava_zones:
+            if lz.thickness > 0:
+                if lz.side == "bottom":
+                    score += max(0, lz.thickness * 2 - (ay2 - ball.y))
+                elif lz.side == "top":
+                    score += max(0, lz.thickness * 2 - (ball.y - ay1))
+                elif lz.side == "left":
+                    score += max(0, lz.thickness * 2 - (ball.x - ax1))
+                elif lz.side == "right":
+                    score += max(0, lz.thickness * 2 - (ax2 - ball.x))
+        return score
+
+print("✅ Game orchestrator ready.")
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 13 — DISPLAY UTILITY & MAIN EXECUTION
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def display_video(video_path: str):
+    try:
+        from IPython.display import HTML, display
+        import base64
+
+        if not os.path.exists(video_path):
+            print(f"❌ Not found: {video_path}")
+            return
+
+        size_mb = os.path.getsize(video_path) / (1024 * 1024)
+        if size_mb > 50:
+            print(f"⚠️ Too large for inline ({size_mb:.1f}MB). Download: {video_path}")
+            return
+
+        with open(video_path, 'rb') as f:
+            data = f.read()
+        b64 = base64.b64encode(data).decode('utf-8')
+
+        html = f"""
+        <div style="text-align:center; margin:20px 0;">
+            <h3>🔴 Brainrot Battle Royale 🔴</h3>
+            <video width="360" height="640" controls autoplay loop
+                   style="border-radius:12px; box-shadow:0 4px 20px rgba(0,0,0,0.3);">
+                <source src="data:video/mp4;base64,{b64}" type="video/mp4">
+            </video>
+            <p style="color:#888; margin-top:8px;">
+                📁 {os.path.basename(video_path)} ({size_mb:.1f} MB)
+            </p>
+        </div>
+        """
+        display(HTML(html))
+    except ImportError:
+        print(f"📁 Video saved: {video_path}")
+    except Exception as e:
+        print(f"⚠️ Display failed: {e}")
+        print(f"📁 Video saved: {video_path}")
+
+print("✅ Display utility ready.")
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# MAIN
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def main():
+    print("\n" + "=" * 60)
+    print("  🔴 BRAINROT BATTLE ROYALE GENERATOR 🔴")
+    print("  100 brainrot balls. Shrinking arena. 7 random challenges.")
+    print("  Fireballs, lasers, meteors, shockwaves. Last meme standing.")
+    print("=" * 60 + "\n")
+
+    config = Config(
+        width=720,
+        height=1280,
+        fps=30,
+        duration=90.0,
+        bitrate="6000k",
+        num_balls=100,
+        ball_radius=14,
+        challenge_interval=8.0,
+        challenges_per_game=7,
+        audio_enabled=True,
+        output_dir="/content/generated_races",
+        image_cache_dir="/content/brainrot_img_cache",
+        seed=None,
+        background_image_path=None,
+    )
+
+    game = BallBattleRoyale(config)
+    video_path = game.run()
+
+    display_video(video_path)
+
+    print("\n" + "=" * 60)
+    print("  ✅ DONE! Your brainrot battle royale video is ready.")
+    print(f"  📁 File: {video_path}")
+    print("=" * 60)
+    print()
+    print("💡 TIPS:")
+    print("   • Run again for a completely different outcome!")
+    print("   • Set config.seed = 12345 for reproducible results")
+    print("   • Set config.background_image_path = '/path/to/img.jpg'")
+    print("   • Change challenges_per_game for more/fewer challenges")
+    print("   • Adjust duration for shorter/longer videos")
+    print()
+
+    return video_path
+
+
+# ── Execute ──
+if __name__ == "__main__":
+    video_result = main()
+else:
+    video_result = main()
