@@ -51,214 +51,214 @@ print("✅ All imports loaded.")
 
 BRAINROT_CHARACTERS: List[Dict[str, Any]] = [
     # ── Italian Brainrot (viral 2025-2026) ──
-    {"name": "Tralalero Tralala",     "emoji": "🦈", "hue": 0.58, "symbol": "Tr",
+    {"name": "Tralalero Tralala",     "emoji": "[SHARK]", "hue": 0.58, "symbol": "Tr",
      "img_query": "tralalero+tralala+shark+meme"},
-    {"name": "Bombardino Crocodilo",  "emoji": "🐊", "hue": 0.35, "symbol": "Bo",
+    {"name": "Bombardino Crocodilo",  "emoji": "[CROC]", "hue": 0.35, "symbol": "Bo",
      "img_query": "bombardino+crocodilo+meme"},
-    {"name": "Tung Tung Sahur",       "emoji": "🥁", "hue": 0.07, "symbol": "TT",
+    {"name": "Tung Tung Sahur",       "emoji": "[DRUM]", "hue": 0.07, "symbol": "TT",
      "img_query": "tung+tung+tung+sahur+meme"},
-    {"name": "Ballerina Cappuccina",  "emoji": "☕", "hue": 0.08, "symbol": "BC",
+    {"name": "Ballerina Cappuccina",  "emoji": "[CAFFE]", "hue": 0.08, "symbol": "BC",
      "img_query": "ballerina+cappuccina+meme"},
-    {"name": "Lirili Larila",         "emoji": "🌵", "hue": 0.33, "symbol": "LL",
+    {"name": "Lirili Larila",         "emoji": "[CACTUS]", "hue": 0.33, "symbol": "LL",
      "img_query": "lirili+larila+cactus+elephant+meme"},
-    {"name": "Brr Brr Patapim",       "emoji": "🥶", "hue": 0.55, "symbol": "BP",
+    {"name": "Brr Brr Patapim",       "emoji": "[COLD]", "hue": 0.55, "symbol": "BP",
      "img_query": "brr+brr+patapim+meme"},
-    {"name": "Chimpanzini Bananini",  "emoji": "🍌", "hue": 0.15, "symbol": "CB",
+    {"name": "Chimpanzini Bananini",  "emoji": "[BANANA]", "hue": 0.15, "symbol": "CB",
      "img_query": "chimpanzini+bananini+meme"},
-    {"name": "Boneca Ambalabu",       "emoji": "🐸", "hue": 0.33, "symbol": "BA",
+    {"name": "Boneca Ambalabu",       "emoji": "[FROG]", "hue": 0.33, "symbol": "BA",
      "img_query": "boneca+ambalabu+meme"},
-    {"name": "Capuccino Assassino",   "emoji": "☠️", "hue": 0.07, "symbol": "CA",
+    {"name": "Capuccino Assassino",   "emoji": "[SKULL]", "hue": 0.07, "symbol": "CA",
      "img_query": "capuccino+assassino+meme"},
-    {"name": "Frigo Camelo",          "emoji": "🐫", "hue": 0.55, "symbol": "FC",
+    {"name": "Frigo Camelo",          "emoji": "[CAMEL]", "hue": 0.55, "symbol": "FC",
      "img_query": "frigo+camelo+meme"},
-    {"name": "Trippi Troppi",         "emoji": "🍄", "hue": 0.80, "symbol": "TrT",
+    {"name": "Trippi Troppi",         "emoji": "[MUSH]", "hue": 0.80, "symbol": "TrT",
      "img_query": "trippi+troppi+mushroom+brainrot"},
-    {"name": "La Vaca Saturno",       "emoji": "🐄", "hue": 0.70, "symbol": "VS",
+    {"name": "La Vaca Saturno",       "emoji": "[COW]", "hue": 0.70, "symbol": "VS",
      "img_query": "la+vaca+saturno+saturnita+meme"},
-    {"name": "Glorbo",                "emoji": "👾", "hue": 0.45, "symbol": "Gl",
+    {"name": "Glorbo",                "emoji": "[ALIEN]", "hue": 0.45, "symbol": "Gl",
      "img_query": "glorbo+brainrot+meme"},
-    {"name": "Bombombini Gusini",     "emoji": "🪿", "hue": 0.15, "symbol": "BG",
+    {"name": "Bombombini Gusini",     "emoji": "[GOOSE]", "hue": 0.15, "symbol": "BG",
      "img_query": "bombombini+gusini+meme"},
-    {"name": "Cocofanto",             "emoji": "🥥", "hue": 0.10, "symbol": "Co",
+    {"name": "Cocofanto",             "emoji": "[COCO]", "hue": 0.10, "symbol": "Co",
      "img_query": "cocofanto+brainrot+meme"},
     # ── Skibidi / Classic Brainrot ──
-    {"name": "Skibidi Toilet",        "emoji": "🚽", "hue": 0.55, "symbol": "ST",
+    {"name": "Skibidi Toilet",        "emoji": "[TOILET]", "hue": 0.55, "symbol": "ST",
      "img_query": "skibidi+toilet+meme"},
-    {"name": "Cameraman",             "emoji": "📷", "hue": 0.10, "symbol": "Cm",
+    {"name": "Cameraman",             "emoji": "[CAM]", "hue": 0.10, "symbol": "Cm",
      "img_query": "skibidi+cameraman+meme"},
-    {"name": "Speakerman",            "emoji": "🔊", "hue": 0.60, "symbol": "Sp",
+    {"name": "Speakerman",            "emoji": "[SPKR]", "hue": 0.60, "symbol": "Sp",
      "img_query": "skibidi+speakerman+meme"},
-    {"name": "TV Man",                "emoji": "📺", "hue": 0.75, "symbol": "TV",
+    {"name": "TV Man",                "emoji": "[TV]", "hue": 0.75, "symbol": "TV",
      "img_query": "skibidi+tv+man+meme"},
-    {"name": "Titan Cameraman",       "emoji": "🤖", "hue": 0.55, "symbol": "Ti",
+    {"name": "Titan Cameraman",       "emoji": "[TITAN]", "hue": 0.55, "symbol": "Ti",
      "img_query": "titan+cameraman+skibidi"},
-    {"name": "Plungerman",            "emoji": "🪠", "hue": 0.05, "symbol": "Pl",
+    {"name": "Plungerman",            "emoji": "[PLUNGE]", "hue": 0.05, "symbol": "Pl",
      "img_query": "plungerman+skibidi+meme"},
     # ── Sigma / Rizz / Streamer Brainrot ──
-    {"name": "Sigma Boy",             "emoji": "🐺", "hue": 0.00, "symbol": "σ",
+    {"name": "Sigma Boy",             "emoji": "[SIGMA]", "hue": 0.00, "symbol": "σ",
      "img_query": "sigma+boy+meme"},
-    {"name": "Rizz God",              "emoji": "😎", "hue": 0.08, "symbol": "Rz",
+    {"name": "Rizz God",              "emoji": "[RIZZ]", "hue": 0.08, "symbol": "Rz",
      "img_query": "rizz+god+meme"},
-    {"name": "Rizzler",               "emoji": "💋", "hue": 0.90, "symbol": "Ri",
+    {"name": "Rizzler",               "emoji": "[RIZZLER]", "hue": 0.90, "symbol": "Ri",
      "img_query": "the+rizzler+baby+meme"},
-    {"name": "Giga Chad",             "emoji": "💪", "hue": 0.00, "symbol": "GC",
-     "img_query": "gigachad+meme"},
-    {"name": "John Pork",             "emoji": "🐷", "hue": 0.95, "symbol": "JP",
+    {"name": "Giga Chad",             "emoji": "[CHAD]", "hue": 0.00, "symbol": "GC",
+     "img_query": "gigachad+meme", "img_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Gigachad.jpg/240px-Gigachad.jpg"},
+    {"name": "John Pork",             "emoji": "[PORK]", "hue": 0.95, "symbol": "JP",
      "img_query": "john+pork+calling+meme"},
-    {"name": "Grimace Shake",         "emoji": "🟣", "hue": 0.78, "symbol": "GS",
+    {"name": "Grimace Shake",         "emoji": "[GRIMACE]", "hue": 0.78, "symbol": "GS",
      "img_query": "grimace+shake+meme"},
-    {"name": "Smurf Cat",             "emoji": "🐱", "hue": 0.58, "symbol": "SC",
+    {"name": "Smurf Cat",             "emoji": "[SMURF]", "hue": 0.58, "symbol": "SC",
      "img_query": "smurf+cat+meme+blue"},
-    {"name": "Ohio Boss",             "emoji": "💀", "hue": 0.00, "symbol": "OH",
+    {"name": "Ohio Boss",             "emoji": "[OHIO]", "hue": 0.00, "symbol": "OH",
      "img_query": "only+in+ohio+boss+meme"},
-    {"name": "Gyatt King",            "emoji": "👑", "hue": 0.12, "symbol": "GK",
+    {"name": "Gyatt King",            "emoji": "[GYATT]", "hue": 0.12, "symbol": "GK",
      "img_query": "gyatt+meme+king"},
-    {"name": "Hawk Tuah",             "emoji": "🦅", "hue": 0.07, "symbol": "HT",
+    {"name": "Hawk Tuah",             "emoji": "[HAWK]", "hue": 0.07, "symbol": "HT",
      "img_query": "hawk+tuah+girl+meme"},
-    {"name": "Kai Cenat",             "emoji": "🎤", "hue": 0.70, "symbol": "KC",
+    {"name": "Kai Cenat",             "emoji": "[KAI]", "hue": 0.70, "symbol": "KC",
      "img_query": "kai+cenat+meme"},
-    {"name": "Speed",                 "emoji": "⚡", "hue": 0.12, "symbol": "IS",
+    {"name": "Speed",                 "emoji": "[SPEED]", "hue": 0.12, "symbol": "IS",
      "img_query": "ishowspeed+meme+face"},
-    {"name": "Caseoh",                "emoji": "🍔", "hue": 0.06, "symbol": "Ca",
+    {"name": "Caseoh",                "emoji": "[CASE]", "hue": 0.06, "symbol": "Ca",
      "img_query": "caseoh+meme"},
-    {"name": "Fanum Tax",             "emoji": "💰", "hue": 0.14, "symbol": "FT",
+    {"name": "Fanum Tax",             "emoji": "[FANUM]", "hue": 0.14, "symbol": "FT",
      "img_query": "fanum+tax+meme"},
-    {"name": "Duke Dennis",           "emoji": "🎮", "hue": 0.28, "symbol": "DD",
+    {"name": "Duke Dennis",           "emoji": "[DUKE]", "hue": 0.28, "symbol": "DD",
      "img_query": "duke+dennis+meme"},
-    {"name": "Baby Gronk",            "emoji": "🏈", "hue": 0.08, "symbol": "BaG",
+    {"name": "Baby Gronk",            "emoji": "[GRONK]", "hue": 0.08, "symbol": "BaG",
      "img_query": "baby+gronk+meme"},
     # ── Classic Internet / Gaming Brainrot ──
-    {"name": "Quandale Dingle",       "emoji": "😂", "hue": 0.30, "symbol": "QD",
+    {"name": "Quandale Dingle",       "emoji": "[QD]", "hue": 0.30, "symbol": "QD",
      "img_query": "quandale+dingle+face+meme"},
-    {"name": "Amogus",                "emoji": "📮", "hue": 0.00, "symbol": "SU",
-     "img_query": "amogus+sus+meme"},
-    {"name": "Freddy Fazbear",        "emoji": "🐻", "hue": 0.07, "symbol": "FF",
+    {"name": "Amogus",                "emoji": "[SUS]", "hue": 0.00, "symbol": "SU",
+     "img_query": "amogus+sus+meme", "img_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Among_Us_cover_art.jpg/240px-Among_Us_cover_art.jpg"},
+    {"name": "Freddy Fazbear",        "emoji": "[FREDDY]", "hue": 0.07, "symbol": "FF",
      "img_query": "freddy+fazbear+meme"},
-    {"name": "Doge",                  "emoji": "🐕", "hue": 0.12, "symbol": "Do",
-     "img_query": "doge+shiba+meme"},
-    {"name": "Pepe",                  "emoji": "🐸", "hue": 0.33, "symbol": "Pe",
-     "img_query": "pepe+frog+meme"},
-    {"name": "Nyan Cat",              "emoji": "🌈", "hue": 0.80, "symbol": "NC",
+    {"name": "Doge",                  "emoji": "[DOGE]", "hue": 0.12, "symbol": "Do",
+     "img_query": "doge+shiba+meme", "img_url": "https://upload.wikimedia.org/wikipedia/en/5/5f/Original_Doge_meme.jpg"},
+    {"name": "Pepe",                  "emoji": "[PEPE]", "hue": 0.33, "symbol": "Pe",
+     "img_query": "pepe+frog+meme", "img_url": "https://upload.wikimedia.org/wikipedia/en/a/a7/Pepe_the_Frog.png"},
+    {"name": "Nyan Cat",              "emoji": "[NYAN]", "hue": 0.80, "symbol": "NC",
      "img_query": "nyan+cat+meme"},
-    {"name": "Big Chungus",           "emoji": "🐰", "hue": 0.45, "symbol": "BC2",
+    {"name": "Big Chungus",           "emoji": "[CHUNGUS]", "hue": 0.45, "symbol": "BC2",
      "img_query": "big+chungus+meme"},
-    {"name": "Ugandan Knuckles",      "emoji": "👊", "hue": 0.00, "symbol": "UK",
+    {"name": "Ugandan Knuckles",      "emoji": "[UGANDA]", "hue": 0.00, "symbol": "UK",
      "img_query": "ugandan+knuckles+meme"},
-    {"name": "Sans Undertale",        "emoji": "💀", "hue": 0.60, "symbol": "Sa",
+    {"name": "Sans Undertale",        "emoji": "[SANS]", "hue": 0.60, "symbol": "Sa",
      "img_query": "sans+undertale+meme"},
-    {"name": "Sonic",                 "emoji": "🔵", "hue": 0.58, "symbol": "So",
-     "img_query": "sonic+meme+face"},
-    {"name": "Creeper",               "emoji": "💚", "hue": 0.33, "symbol": "Cr",
+    {"name": "Sonic",                 "emoji": "[SONIC]", "hue": 0.58, "symbol": "So",
+     "img_query": "sonic+meme+face", "img_url": "https://upload.wikimedia.org/wikipedia/en/b/bf/Sonicthehedgehog.png"},
+    {"name": "Creeper",               "emoji": "[CREEPER]", "hue": 0.33, "symbol": "Cr",
      "img_query": "creeper+minecraft+meme"},
-    {"name": "Steve MC",              "emoji": "⛏️", "hue": 0.55, "symbol": "SM",
+    {"name": "Steve MC",              "emoji": "[STEVE]", "hue": 0.55, "symbol": "SM",
      "img_query": "steve+minecraft+face+meme"},
-    {"name": "Drip Goku",             "emoji": "🐲", "hue": 0.58, "symbol": "DG",
+    {"name": "Drip Goku",             "emoji": "[GOKU]", "hue": 0.58, "symbol": "DG",
      "img_query": "drip+goku+meme"},
-    {"name": "Shrek",                 "emoji": "🟢", "hue": 0.33, "symbol": "Sh",
-     "img_query": "shrek+face+meme"},
-    {"name": "Spongebob",             "emoji": "🧽", "hue": 0.15, "symbol": "SB",
+    {"name": "Shrek",                 "emoji": "[SHREK]", "hue": 0.33, "symbol": "Sh",
+     "img_query": "shrek+face+meme", "img_url": "https://upload.wikimedia.org/wikipedia/en/1/14/Shrek.jpg"},
+    {"name": "Spongebob",             "emoji": "[SPONGE]", "hue": 0.15, "symbol": "SB",
      "img_query": "spongebob+mocking+meme"},
-    {"name": "Walter White",          "emoji": "🧪", "hue": 0.40, "symbol": "WW",
+    {"name": "Walter White",          "emoji": "[WALTER]", "hue": 0.40, "symbol": "WW",
      "img_query": "walter+white+heisenberg+meme"},
-    {"name": "Rick Astley",           "emoji": "🎶", "hue": 0.00, "symbol": "RA",
+    {"name": "Rick Astley",           "emoji": "[RICK]", "hue": 0.00, "symbol": "RA",
      "img_query": "rick+astley+rickroll+meme"},
-    {"name": "Mr Beast",              "emoji": "🎁", "hue": 0.55, "symbol": "MrB",
+    {"name": "Mr Beast",              "emoji": "[BEAST]", "hue": 0.55, "symbol": "MrB",
      "img_query": "mrbeast+meme+face"},
-    {"name": "Hasbulla",              "emoji": "👶", "hue": 0.08, "symbol": "Ha",
+    {"name": "Hasbulla",              "emoji": "[HASBULLA]", "hue": 0.08, "symbol": "Ha",
      "img_query": "hasbulla+meme+face"},
-    {"name": "Toothless Dance",       "emoji": "🐉", "hue": 0.70, "symbol": "TL",
+    {"name": "Toothless Dance",       "emoji": "[TOOTHLESS]", "hue": 0.70, "symbol": "TL",
      "img_query": "toothless+dance+meme"},
-    {"name": "Pingu",                 "emoji": "🐧", "hue": 0.55, "symbol": "Pg",
+    {"name": "Pingu",                 "emoji": "[PINGU]", "hue": 0.55, "symbol": "Pg",
      "img_query": "pingu+noot+noot+meme"},
-    {"name": "Goofy Ahh",             "emoji": "🤡", "hue": 0.02, "symbol": "GA",
+    {"name": "Goofy Ahh",             "emoji": "[GOOFY]", "hue": 0.02, "symbol": "GA",
      "img_query": "goofy+ahh+meme"},
-    {"name": "Peter Griffin",         "emoji": "🍺", "hue": 0.55, "symbol": "PG",
+    {"name": "Peter Griffin",         "emoji": "[PETER]", "hue": 0.55, "symbol": "PG",
      "img_query": "peter+griffin+meme+face"},
-    {"name": "Morbius",               "emoji": "🧛", "hue": 0.78, "symbol": "MB",
+    {"name": "Morbius",               "emoji": "[MORB]", "hue": 0.78, "symbol": "MB",
      "img_query": "morbius+morbin+time+meme"},
-    {"name": "Thanos",                "emoji": "🟣", "hue": 0.78, "symbol": "Th",
+    {"name": "Thanos",                "emoji": "[THANOS]", "hue": 0.78, "symbol": "Th",
      "img_query": "thanos+snap+meme"},
-    {"name": "Dababy",                "emoji": "👉", "hue": 0.55, "symbol": "DB",
+    {"name": "Dababy",                "emoji": "[DABABY]", "hue": 0.55, "symbol": "DB",
      "img_query": "dababy+lets+go+meme"},
-    {"name": "Stonks",                "emoji": "📈", "hue": 0.33, "symbol": "St",
+    {"name": "Stonks",                "emoji": "[STONKS]", "hue": 0.33, "symbol": "St",
      "img_query": "stonks+meme+man"},
-    {"name": "Bingus",                "emoji": "🐱", "hue": 0.95, "symbol": "Bi",
+    {"name": "Bingus",                "emoji": "[BINGUS]", "hue": 0.95, "symbol": "Bi",
      "img_query": "bingus+cat+meme"},
-    {"name": "Floppa",                "emoji": "🐈", "hue": 0.08, "symbol": "Fl",
+    {"name": "Floppa",                "emoji": "[FLOPPA]", "hue": 0.08, "symbol": "Fl",
      "img_query": "floppa+big+floppa+meme"},
-    {"name": "Juan Horse",            "emoji": "🐴", "hue": 0.07, "symbol": "Ju",
+    {"name": "Juan Horse",            "emoji": "[JUAN]", "hue": 0.07, "symbol": "Ju",
      "img_query": "juan+horse+balcony+meme"},
-    {"name": "NPC Man",               "emoji": "🧍", "hue": 0.45, "symbol": "NP",
+    {"name": "NPC Man",               "emoji": "[NPC]", "hue": 0.45, "symbol": "NP",
      "img_query": "npc+meme+man"},
-    {"name": "Mewing Master",         "emoji": "🤫", "hue": 0.55, "symbol": "MW",
+    {"name": "Mewing Master",         "emoji": "[MEWING]", "hue": 0.55, "symbol": "MW",
      "img_query": "mewing+meme"},
-    {"name": "Pibby",                 "emoji": "📡", "hue": 0.62, "symbol": "Pi",
+    {"name": "Pibby",                 "emoji": "[PIBBY]", "hue": 0.62, "symbol": "Pi",
      "img_query": "pibby+glitch+meme"},
-    {"name": "Waluigi",               "emoji": "🟣", "hue": 0.75, "symbol": "Wa",
+    {"name": "Waluigi",               "emoji": "[WALU]", "hue": 0.75, "symbol": "Wa",
      "img_query": "waluigi+meme"},
-    {"name": "Luigi Death Stare",     "emoji": "🟢", "hue": 0.35, "symbol": "Lu",
+    {"name": "Luigi Death Stare",     "emoji": "[LUIGI]", "hue": 0.35, "symbol": "Lu",
      "img_query": "luigi+death+stare+meme"},
-    {"name": "Enderman",              "emoji": "🟪", "hue": 0.78, "symbol": "En",
+    {"name": "Enderman",              "emoji": "[ENDER]", "hue": 0.78, "symbol": "En",
      "img_query": "enderman+minecraft+meme"},
-    {"name": "Patrick Star",          "emoji": "⭐", "hue": 0.95, "symbol": "PS",
+    {"name": "Patrick Star",          "emoji": "[PATRICK]", "hue": 0.95, "symbol": "PS",
      "img_query": "patrick+star+meme"},
-    {"name": "Vibe Check",            "emoji": "✅", "hue": 0.33, "symbol": "VC",
+    {"name": "Vibe Check",            "emoji": "[VIBE]", "hue": 0.33, "symbol": "VC",
      "img_query": "vibe+check+meme"},
-    {"name": "Skill Issue",           "emoji": "📛", "hue": 0.00, "symbol": "SI",
+    {"name": "Skill Issue",           "emoji": "[SKILL]", "hue": 0.00, "symbol": "SI",
      "img_query": "skill+issue+meme"},
-    {"name": "Caught in 4K",          "emoji": "📸", "hue": 0.55, "symbol": "4K",
+    {"name": "Caught in 4K",          "emoji": "[4K]", "hue": 0.55, "symbol": "4K",
      "img_query": "caught+in+4k+meme"},
-    {"name": "Sus Baka",              "emoji": "🔺", "hue": 0.00, "symbol": "SBa",
+    {"name": "Sus Baka",              "emoji": "[SUSBAKA]", "hue": 0.00, "symbol": "SBa",
      "img_query": "sus+baka+meme"},
-    {"name": "Edging Expert",         "emoji": "🏔️", "hue": 0.55, "symbol": "EE",
+    {"name": "Edging Expert",         "emoji": "[EDGE]", "hue": 0.55, "symbol": "EE",
      "img_query": "edging+meme+brainrot"},
-    {"name": "Ratio King",            "emoji": "📊", "hue": 0.60, "symbol": "RK",
+    {"name": "Ratio King",            "emoji": "[RATIO]", "hue": 0.60, "symbol": "RK",
      "img_query": "ratio+meme+twitter"},
-    {"name": "W Holder",              "emoji": "🏆", "hue": 0.14, "symbol": "WH",
+    {"name": "W Holder",              "emoji": "[W]", "hue": 0.14, "symbol": "WH",
      "img_query": "w+meme+holding"},
-    {"name": "Cope Lord",             "emoji": "😤", "hue": 0.02, "symbol": "CL",
+    {"name": "Cope Lord",             "emoji": "[COPE]", "hue": 0.02, "symbol": "CL",
      "img_query": "cope+seethe+meme"},
-    {"name": "Blud",                  "emoji": "🩸", "hue": 0.00, "symbol": "Bl",
+    {"name": "Blud",                  "emoji": "[BLUD]", "hue": 0.00, "symbol": "Bl",
      "img_query": "blud+meme+skull"},
-    {"name": "Bruh Moment",           "emoji": "😐", "hue": 0.45, "symbol": "BM",
+    {"name": "Bruh Moment",           "emoji": "[BRUH]", "hue": 0.45, "symbol": "BM",
      "img_query": "bruh+moment+meme"},
-    {"name": "Based King",            "emoji": "👑", "hue": 0.12, "symbol": "BK",
+    {"name": "Based King",            "emoji": "[BASED]", "hue": 0.12, "symbol": "BK",
      "img_query": "based+chad+meme"},
-    {"name": "Touch Grass",           "emoji": "🌿", "hue": 0.33, "symbol": "TG",
+    {"name": "Touch Grass",           "emoji": "[GRASS]", "hue": 0.33, "symbol": "TG",
      "img_query": "touch+grass+meme"},
-    {"name": "Yeet Champion",         "emoji": "🎯", "hue": 0.55, "symbol": "YC",
+    {"name": "Yeet Champion",         "emoji": "[YEET]", "hue": 0.55, "symbol": "YC",
      "img_query": "yeet+meme"},
-    {"name": "Main Character",        "emoji": "🎬", "hue": 0.70, "symbol": "MC",
+    {"name": "Main Character",        "emoji": "[MAIN]", "hue": 0.70, "symbol": "MC",
      "img_query": "main+character+energy+meme"},
-    {"name": "Plot Armor",            "emoji": "🛡️", "hue": 0.55, "symbol": "PA",
+    {"name": "Plot Armor",            "emoji": "[PLOT]", "hue": 0.55, "symbol": "PA",
      "img_query": "plot+armor+meme+anime"},
-    {"name": "Did You Pray",          "emoji": "🙏", "hue": 0.45, "symbol": "DP",
+    {"name": "Did You Pray",          "emoji": "[PRAY]", "hue": 0.45, "symbol": "DP",
      "img_query": "did+you+pray+today+meme"},
-    {"name": "Ayo?!",                 "emoji": "😳", "hue": 0.08, "symbol": "AY",
+    {"name": "Ayo?!",                 "emoji": "[AYO]", "hue": 0.08, "symbol": "AY",
      "img_query": "ayo+sus+meme"},
-    {"name": "It's Corn",             "emoji": "🌽", "hue": 0.15, "symbol": "IC",
+    {"name": "It's Corn",             "emoji": "[CORN]", "hue": 0.15, "symbol": "IC",
      "img_query": "its+corn+kid+meme"},
-    {"name": "Glizzy Gobbler",        "emoji": "🌭", "hue": 0.10, "symbol": "GG",
+    {"name": "Glizzy Gobbler",        "emoji": "[GLIZZY]", "hue": 0.10, "symbol": "GG",
      "img_query": "glizzy+gobbler+meme"},
-    {"name": "Dream",                 "emoji": "🎭", "hue": 0.33, "symbol": "Dr",
+    {"name": "Dream",                 "emoji": "[DREAM]", "hue": 0.33, "symbol": "Dr",
      "img_query": "dream+smp+smile+meme"},
-    {"name": "Baby Shark",            "emoji": "🦈", "hue": 0.55, "symbol": "BS",
+    {"name": "Baby Shark",            "emoji": "[BSHARK]", "hue": 0.55, "symbol": "BS",
      "img_query": "baby+shark+meme"},
-    {"name": "Shadow",                "emoji": "🖤", "hue": 0.00, "symbol": "Shd",
+    {"name": "Shadow",                "emoji": "[SHADOW]", "hue": 0.00, "symbol": "Shd",
      "img_query": "shadow+hedgehog+meme"},
-    {"name": "Ankha Zone",            "emoji": "🐈", "hue": 0.12, "symbol": "AZ",
+    {"name": "Ankha Zone",            "emoji": "[ANKHA]", "hue": 0.12, "symbol": "AZ",
      "img_query": "ankha+zone+meme"},
-    {"name": "Jellybean",             "emoji": "🫘", "hue": 0.85, "symbol": "JB",
+    {"name": "Jellybean",             "emoji": "[JELLY]", "hue": 0.85, "symbol": "JB",
      "img_query": "jellybean+youtuber+meme"},
-    {"name": "No Cap",                "emoji": "🚫", "hue": 0.55, "symbol": "NCp",
+    {"name": "No Cap",                "emoji": "[NOCAP]", "hue": 0.55, "symbol": "NCp",
      "img_query": "no+cap+meme"},
-    {"name": "Bussin Boy",            "emoji": "🍗", "hue": 0.10, "symbol": "BB",
+    {"name": "Bussin Boy",            "emoji": "[BUSSIN]", "hue": 0.10, "symbol": "BB",
      "img_query": "bussin+meme+food"},
-    {"name": "Livvy Dunne",           "emoji": "🤸", "hue": 0.90, "symbol": "LD",
+    {"name": "Livvy Dunne",           "emoji": "[LIVVY]", "hue": 0.90, "symbol": "LD",
      "img_query": "livvy+dunne+meme"},
-    {"name": "Gigachad Jr",           "emoji": "🦸", "hue": 0.00, "symbol": "GJ",
+    {"name": "Gigachad Jr",           "emoji": "[GJ]", "hue": 0.00, "symbol": "GJ",
      "img_query": "gigachad+junior+meme"},
-    {"name": "Tim Cheese",            "emoji": "🐭", "hue": 0.15, "symbol": "TC",
+    {"name": "Tim Cheese",            "emoji": "[TIM]", "hue": 0.15, "symbol": "TC",
      "img_query": "tim+cheese+meme+brainrot"},
 ]
 
@@ -294,21 +294,35 @@ def download_character_images(characters: List[Dict], cache_dir: str,
 
         # Intentar descargar
         downloaded = False
-        query = char.get("img_query", name.replace(" ", "+"))
 
-        # Método: usar un servicio de placeholder con el nombre
-        # (robohash genera avatares únicos por texto)
-        try:
-            url = f"https://robohash.org/{quote(name)}?size={icon_size}x{icon_size}&set=set4"
-            resp = requests.get(url, timeout=5)
-            if resp.status_code == 200 and len(resp.content) > 500:
-                img = Image.open(io.BytesIO(resp.content)).convert("RGBA")
-                img = img.resize((icon_size, icon_size), Image.LANCZOS)
-                img.save(cache_path)
-                images[name] = img
-                downloaded = True
-        except Exception:
-            pass
+        # Try direct img_url first (real character image)
+        img_url_direct = char.get("img_url", "")
+        if img_url_direct and not downloaded:
+            try:
+                resp = requests.get(img_url_direct, timeout=8,
+                                    headers={"User-Agent": "Mozilla/5.0"})
+                if resp.status_code == 200 and len(resp.content) > 500:
+                    img = Image.open(io.BytesIO(resp.content)).convert("RGBA")
+                    img = img.resize((icon_size, icon_size), Image.LANCZOS)
+                    img.save(cache_path)
+                    images[name] = img
+                    downloaded = True
+            except Exception:
+                pass
+
+        # Fallback: robohash (generates unique avatar per name)
+        if not downloaded:
+            try:
+                url = f"https://robohash.org/{quote(name)}?size={icon_size}x{icon_size}&set=set4"
+                resp = requests.get(url, timeout=5)
+                if resp.status_code == 200 and len(resp.content) > 500:
+                    img = Image.open(io.BytesIO(resp.content)).convert("RGBA")
+                    img = img.resize((icon_size, icon_size), Image.LANCZOS)
+                    img.save(cache_path)
+                    images[name] = img
+                    downloaded = True
+            except Exception:
+                pass
 
         if not downloaded:
             # Fallback: generar icono con símbolo
@@ -862,7 +876,7 @@ def _register(name, emoji, category):
     return decorator
 
 
-@_register("FIREBALL FRENZY", "🔥", "fireball")
+@_register("FIREBALL FRENZY", "[FIRE]", "fireball")
 def _ch_fireball(balls, arena, hazards, rng, config, **kw):
     ax1, ay1, ax2, ay2 = arena
     for _ in range(rng.randint(2, 4)):
@@ -879,7 +893,7 @@ def _ch_fireball(balls, arena, hazards, rng, config, **kw):
         ))
 
 
-@_register("SPINNING DEATH RAY", "⚡", "laser")
+@_register("SPINNING DEATH RAY", "[ZAP]", "laser")
 def _ch_spinning_laser(balls, arena, hazards, rng, config, **kw):
     ax1, ay1, ax2, ay2 = arena
     cx, cy = (ax1 + ax2) / 2, (ay1 + ay2) / 2
@@ -898,7 +912,7 @@ def _ch_spinning_laser(balls, arena, hazards, rng, config, **kw):
     ))
 
 
-@_register("DEATH WALL", "🧱", "wall")
+@_register("DEATH WALL", "[WALL]", "wall")
 def _ch_death_wall(balls, arena, hazards, rng, config, **kw):
     sides = rng.sample(["left", "right", "top", "bottom"], rng.randint(1, 2))
     for side in sides:
@@ -911,7 +925,7 @@ def _ch_death_wall(balls, arena, hazards, rng, config, **kw):
         ))
 
 
-@_register("SHOCKWAVE BLAST", "💥", "shockwave")
+@_register("SHOCKWAVE BLAST", "[BOOM]", "shockwave")
 def _ch_shockwave(balls, arena, hazards, rng, config, **kw):
     ax1, ay1, ax2, ay2 = arena
     thick = rng.uniform(10, 18)
@@ -926,7 +940,7 @@ def _ch_shockwave(balls, arena, hazards, rng, config, **kw):
     ))
 
 
-@_register("METEOR SHOWER", "☄️", "meteor")
+@_register("METEOR SHOWER", "[COMET]", "meteor")
 def _ch_meteor(balls, arena, hazards, rng, config, **kw):
     ax1, ay1, ax2, ay2 = arena
     for _ in range(rng.randint(4, 8)):
@@ -942,7 +956,7 @@ def _ch_meteor(balls, arena, hazards, rng, config, **kw):
         ))
 
 
-@_register("SPIKE MINEFIELD", "⚠️", "spikes")
+@_register("SPIKE MINEFIELD", "[!]", "spikes")
 def _ch_spikes(balls, arena, hazards, rng, config, **kw):
     ax1, ay1, ax2, ay2 = arena
     alive_balls = [b for b in balls if b.alive]
@@ -963,7 +977,7 @@ def _ch_spikes(balls, arena, hazards, rng, config, **kw):
         ))
 
 
-@_register("LAVA SURGE", "🌋", "lava")
+@_register("LAVA SURGE", "[LAVA]", "lava")
 def _ch_lava(balls, arena, hazards, rng, config, **kw):
     existing_sides = {lz.side for lz in hazards.lava_zones}
     available_sides = [s for s in ["bottom", "left", "right", "top"]
@@ -988,7 +1002,7 @@ def _ch_lava(balls, arena, hazards, rng, config, **kw):
             lz.grow_speed = min(lz.grow_speed + 0.02, 0.12)
 
 
-@_register("BLACK HOLE", "⚫", "vortex")
+@_register("BLACK HOLE", "[VOID]", "vortex")
 def _ch_vortex(balls, arena, hazards, rng, config, **kw):
     ax1, ay1, ax2, ay2 = arena
     hazards.vortices.append(Vortex(
@@ -1001,7 +1015,7 @@ def _ch_vortex(balls, arena, hazards, rng, config, **kw):
     ))
 
 
-@_register("SPEED BOOST", "🚀", "speed")
+@_register("SPEED BOOST", "[SPEED]", "speed")
 def _ch_speed(balls, arena, hazards, rng, config, **kw):
     for b in balls:
         if b.alive:
@@ -1009,7 +1023,7 @@ def _ch_speed(balls, arena, hazards, rng, config, **kw):
             b.vy *= rng.uniform(1.8, 2.5)
 
 
-@_register("TELEPORT SHUFFLE", "✨", "teleport")
+@_register("TELEPORT SHUFFLE", "[TP]", "teleport")
 def _ch_teleport(balls, arena, hazards, rng, config, **kw):
     ax1, ay1, ax2, ay2 = arena
     for b in balls:
@@ -1054,7 +1068,7 @@ def _ch_teleport(balls, arena, hazards, rng, config, **kw):
             b.invincible_timer = max(b.invincible_timer, 1.5)  # 1.5s invincibility
 
 
-@_register("SCATTER SHOT", "💫", "scatter")
+@_register("SCATTER SHOT", "[SCATTER]", "scatter")
 def _ch_scatter(balls, arena, hazards, rng, config, **kw):
     ax1, ay1, ax2, ay2 = arena
     cx, cy = (ax1 + ax2) / 2, (ay1 + ay2) / 2
@@ -1067,7 +1081,7 @@ def _ch_scatter(balls, arena, hazards, rng, config, **kw):
             b.vy += (dy / dist) * force
 
 
-@_register("IMPLOSION", "🌀", "implode")
+@_register("IMPLOSION", "[SWIRL]", "implode")
 def _ch_implode(balls, arena, hazards, rng, config, **kw):
     ax1, ay1, ax2, ay2 = arena
     cx, cy = (ax1 + ax2) / 2, (ay1 + ay2) / 2
@@ -1080,7 +1094,7 @@ def _ch_implode(balls, arena, hazards, rng, config, **kw):
             b.vy += (dy / dist) * force
 
 
-@_register("EARTHQUAKE", "🫨", "earthquake")
+@_register("EARTHQUAKE", "[QUAKE]", "earthquake")
 def _ch_earthquake(balls, arena, hazards, rng, config, **kw):
     for b in balls:
         if b.alive:
@@ -1088,19 +1102,19 @@ def _ch_earthquake(balls, arena, hazards, rng, config, **kw):
             b.vy += rng.uniform(-5, 5)
 
 
-@_register("DOUBLE FIREBALL + LASER", "🔥⚡", "combo1")
+@_register("DOUBLE FIREBALL + LASER", "[FIRE+ZAP]", "combo1")
 def _ch_combo1(balls, arena, hazards, rng, config, **kw):
     _ch_fireball(balls, arena, hazards, rng, config, **kw)
     _ch_spinning_laser(balls, arena, hazards, rng, config, **kw)
 
 
-@_register("METEOR + SHOCKWAVE", "☄️💥", "combo2")
+@_register("METEOR + SHOCKWAVE", "[COMET+BOOM]", "combo2")
 def _ch_combo2(balls, arena, hazards, rng, config, **kw):
     _ch_meteor(balls, arena, hazards, rng, config, **kw)
     _ch_shockwave(balls, arena, hazards, rng, config, **kw)
 
 
-@_register("TRIPLE THREAT", "💀💀💀", "combo3")
+@_register("TRIPLE THREAT", "[TRIPLE]", "combo3")
 def _ch_combo3(balls, arena, hazards, rng, config, **kw):
     ax1, ay1, ax2, ay2 = arena
     # Fireballs + spikes + death wall
@@ -1122,7 +1136,7 @@ def _ch_combo3(balls, arena, hazards, rng, config, **kw):
         lifetime_frames=600))
 
 
-@_register("INVINCIBILITY ROULETTE", "🛡️", "invincible")
+@_register("INVINCIBILITY ROULETTE", "[SHIELD]", "invincible")
 def _ch_invincible(balls, arena, hazards, rng, config, **kw):
     alive = [b for b in balls if b.alive]
     lucky = rng.sample(alive, min(len(alive), max(1, len(alive) // 4)))
@@ -1130,13 +1144,13 @@ def _ch_invincible(balls, arena, hazards, rng, config, **kw):
         b.invincible_timer = rng.uniform(4.0, 8.0)
 
 
-@_register("ARENA SHRINK", "🔬", "shrink")
+@_register("ARENA SHRINK", "[SHRINK]", "shrink")
 def _ch_shrink(balls, arena, hazards, rng, config, **kw):
     config.arena_margin_end = min(config.arena_margin_end + 40,
                                   min(config.width, config.height) // 2 - 50)
 
 
-@_register("FREEZE FRAME", "🧊", "freeze")
+@_register("FREEZE FRAME", "[FREEZE]", "freeze")
 def _ch_freeze(balls, arena, hazards, rng, config, **kw):
     for b in balls:
         if b.alive:
@@ -1144,7 +1158,7 @@ def _ch_freeze(balls, arena, hazards, rng, config, **kw):
             b.vy *= 0.08
 
 
-@_register("REVERSE GRAVITY", "🔄", "reverse")
+@_register("REVERSE GRAVITY", "[REVERSE]", "reverse")
 def _ch_reverse(balls, arena, hazards, rng, config, **kw):
     for b in balls:
         if b.alive:
@@ -1152,7 +1166,7 @@ def _ch_reverse(balls, arena, hazards, rng, config, **kw):
             b.vy = -b.vy
 
 
-@_register("BUMPER CARS", "🏎️", "bumper")
+@_register("BUMPER CARS", "[BUMPER]", "bumper")
 def _ch_bumper(balls, arena, hazards, rng, config, **kw):
     for b in balls:
         if b.alive:
@@ -1162,7 +1176,7 @@ def _ch_bumper(balls, arena, hazards, rng, config, **kw):
             b.vy = math.sin(angle) * spd
 
 
-@_register("TORNADO", "🌪️", "tornado")
+@_register("TORNADO", "[TWISTER]", "tornado")
 def _ch_tornado(balls, arena, hazards, rng, config, **kw):
     ax1, ay1, ax2, ay2 = arena
     hazards.vortices.append(Vortex(
@@ -1179,7 +1193,7 @@ def _ch_tornado(balls, arena, hazards, rng, config, **kw):
             b.vy += rng.uniform(-3, 3)
 
 
-@_register("THANOS SNAP", "🫰💀", "thanos")
+@_register("THANOS SNAP", "[THANOS]", "thanos")
 def _ch_thanos(balls, arena, hazards, rng, config, **kw):
     """Elimina exactamente la mitad de las bolas vivas — pero con
     una shockwave visible primero."""
@@ -1530,32 +1544,29 @@ class Renderer:
             draw.ellipse([x - gr, y - gr, x + gr, y + gr],
                          outline=(255, 255, 100), width=3)
 
-        # Main ball
-        draw.ellipse([x - r, y - r, x + r, y + r],
-                     fill=ball.color, outline=ball.outline_color,
-                     width=self.config.ball_outline_width)
+        # Main ball color background
+        draw.ellipse([x - r, y - r, x + r, y + r], fill=ball.color)
 
-        # Shine
-        sr = max(2, r // 3)
-        sx, sy = x - r // 3, y - r // 3
-        draw.ellipse([sx - sr, sy - sr, sx + sr, sy + sr], fill=ball.accent)
-
-        # Character image overlay
+        # Character image overlay — covers the full ball circle
         char_img = self._character_images.get(ball.name)
         if char_img is not None:
-            icon_size = r * 2
-            if icon_size >= 6:
+            diam = r * 2
+            if diam >= 6:
                 try:
-                    resized = char_img.resize((icon_size, icon_size), Image.NEAREST)
-                    # Crear máscara circular
-                    mask = Image.new("L", (icon_size, icon_size), 0)
+                    resized = char_img.resize((diam, diam), Image.LANCZOS)
+                    mask = Image.new("L", (diam, diam), 0)
                     mask_draw = ImageDraw.Draw(mask)
-                    mask_draw.ellipse([0, 0, icon_size - 1, icon_size - 1], fill=255)
-                    px = x - icon_size // 2
-                    py = y - icon_size // 2
+                    mask_draw.ellipse([0, 0, diam - 1, diam - 1], fill=255)
+                    px = x - r
+                    py = y - r
                     img.paste(resized, (px, py), mask)
                 except Exception:
                     pass
+
+        # Ball outline drawn AFTER image paste
+        draw.ellipse([x - r, y - r, x + r, y + r],
+                     outline=ball.outline_color,
+                     width=self.config.ball_outline_width)
 
         # Name label
         if r >= 8:
@@ -1692,9 +1703,7 @@ class Renderer:
             cr = max(2, fbr // 2)
             draw.ellipse([fbx - cr, fby - cr, fbx + cr, fby + cr],
                          fill=(255, 255, 200))
-            # Fire emoji label
-            ff = self._font(max(10, fbr))
-            draw.text((fbx - fbr // 2, fby - fbr // 2), "🔥", font=ff)
+
 
         # ── Spinning Lasers ──
         for sl in hazards.spinning_lasers:
@@ -1721,8 +1730,7 @@ class Renderer:
             draw.ellipse([scx - 10, scy - 10, scx + 10, scy + 10],
                          fill=(255, 200, 100) if in_warmup else (255, 100, 100),
                          outline=(255, 255, 255), width=2)
-            cf = self._font(14)
-            draw.text((scx - 5, scy - 7), "⚡", font=cf)
+
 
         # ── Death Walls ──
         for dw in hazards.death_walls:
@@ -1836,9 +1844,7 @@ class Renderer:
                          fill=(180, 0, 0), outline=(255, 50, 50), width=3)
             draw.ellipse([vx - kr, vy - kr, vx + kr, vy + kr],
                          fill=(255, 0, 0), outline=(255, 180, 0), width=2)
-            # Label
-            vf = self._font(14)
-            draw.text((vx - 5, vy - 7), "⚫", font=vf)
+
 
     # ══════════════════════════════════════════════════════════════════════════
     # PARTICLES
@@ -1909,7 +1915,7 @@ class Renderer:
             draw.ellipse([xp, yp + i * 22, xp + 10, yp + i * 22 + 10],
                          fill=color)
             tc = tuple(int(200 * af) for _ in range(3))
-            draw.text((xp + 14, yp + i * 22 - 2), f"☠ {name[:12]}",
+            draw.text((xp + 14, yp + i * 22 - 2), f"X {name[:12]}",
                       font=ff, fill=tc)
 
     # ══════════════════════════════════════════════════════════════════════════
@@ -1944,11 +1950,11 @@ class Renderer:
 
         hf = self._font(18)
         self._outlined_text(draw, (bx_b + 15, by_b + 5),
-                            "⚡ NEW CHALLENGE! ⚡", hf,
+                            "> NEW CHALLENGE! <<", hf,
                             (255, 200, 50), outline_w=2)
 
         nf = self._font(26)
-        ct = f"{emoji} {name} {emoji}"
+        ct = f"[ {name} ]"
         bbox_c = draw.textbbox((0, 0), ct, font=nf)
         tw_c = bbox_c[2] - bbox_c[0]
         nx = bx_b + (bw_b - tw_c) // 2
@@ -1970,7 +1976,7 @@ class Renderer:
 
         # Title
         tf = self._font(30)
-        title = "🔴 BRAINROT BATTLE ROYALE 🔴"
+        title = "> BRAINROT BATTLE ROYALE <<"
         bbox_t = draw.textbbox((0, 0), title, font=tf)
         tw_t = bbox_t[2] - bbox_t[0]
         self._outlined_text(draw, ((w - tw_t) // 2, 12), title, tf,
@@ -2003,7 +2009,7 @@ class Renderer:
 
         # Timer
         tmf = self._font(22)
-        self._outlined_text(draw, (w - 120, 12), f"⏱ {t:.1f}s", tmf,
+        self._outlined_text(draw, (w - 120, 12), f"T: {t:.1f}s", tmf,
                             (200, 200, 200))
 
         # Challenge sidebar
@@ -2015,13 +2021,13 @@ class Renderer:
         cy_ch += 20
         for idx, ch in enumerate(selected_challenges):
             if idx < challenge_index:
-                sc, prefix = (100, 100, 100), "✅"
+                sc, prefix = (100, 100, 100), "[X]"
             elif idx == challenge_index:
-                sc, prefix = (255, 255, 50), "▶️"
+                sc, prefix = (255, 255, 50), ">>>"
             else:
-                sc, prefix = (150, 150, 150), "⏳"
+                sc, prefix = (150, 150, 150), "..."
             self._outlined_text(draw, (cx_ch, cy_ch),
-                                f"{prefix} {ch['emoji']} {ch['name'][:16]}",
+                                f"{prefix} {ch['emoji'][:12]} {ch['name'][:14]}",
                                 chf, sc, outline_w=1)
             cy_ch += 18
 
@@ -2060,19 +2066,19 @@ class Renderer:
         pp = progress
         if 0.30 < pp < 0.34 and alive > 30:
             hf = self._font(34)
-            hook = "WHO WILL SURVIVE? 🤔"
+            hook = "WHO WILL SURVIVE?"
             bbox_h = draw.textbbox((0, 0), hook, font=hf)
             self._outlined_text(draw, ((w - bbox_h[2] + bbox_h[0]) // 2, h // 2 - 30),
                                 hook, hf, (255, 224, 0), outline_w=4)
         if 0.55 < pp < 0.59 and alive > 10:
             hf = self._font(32)
-            hook = "¿QUIÉN SOBREVIVE? 🔥"
+            hook = "QUIEN SOBREVIVE?"
             bbox_h = draw.textbbox((0, 0), hook, font=hf)
             self._outlined_text(draw, ((w - bbox_h[2] + bbox_h[0]) // 2, h // 2 - 30),
                                 hook, hf, (255, 150, 50), outline_w=4)
         if 0.78 < pp < 0.82 and alive > 3:
             hf = self._font(36)
-            hook = "FINAL SHOWDOWN! ⚔️"
+            hook = "FINAL SHOWDOWN!"
             bbox_h = draw.textbbox((0, 0), hook, font=hf)
             self._outlined_text(draw, ((w - bbox_h[2] + bbox_h[0]) // 2, h // 2 - 30),
                                 hook, hf, (255, 50, 50), outline_w=4)
@@ -2080,7 +2086,7 @@ class Renderer:
         # Subscribe button
         if frame % 350 < 160 and phase == "racing":
             sf = self._font(20)
-            st = "👆 SUBSCRIBE 👆"
+            st = "> SUBSCRIBE <<"
             bbox_s = draw.textbbox((0, 0), st, font=sf)
             tw_s = bbox_s[2] - bbox_s[0]
             sx = (w - tw_s) // 2
@@ -2092,19 +2098,19 @@ class Renderer:
         # Milestone alerts
         if alive == 10:
             af = self._font(38)
-            at = "🔥 TOP 10! 🔥"
+            at = "** TOP 10! **"
             bbox_a = draw.textbbox((0, 0), at, font=af)
             self._outlined_text(draw, ((w - bbox_a[2] + bbox_a[0]) // 2, 140),
                                 at, af, (255, 100, 50), outline_w=4)
         if alive == 5:
             af = self._font(42)
-            at = "⚡ FINAL 5! ⚡"
+            at = "** FINAL 5! **"
             bbox_a = draw.textbbox((0, 0), at, font=af)
             self._outlined_text(draw, ((w - bbox_a[2] + bbox_a[0]) // 2, 140),
                                 at, af, (255, 50, 255), outline_w=4)
         if alive == 2:
             af = self._font(46)
-            at = "💀 1v1 FINAL! 💀"
+            at = "** 1v1 FINAL! **"
             bbox_a = draw.textbbox((0, 0), at, font=af)
             self._outlined_text(draw, ((w - bbox_a[2] + bbox_a[0]) // 2, 140),
                                 at, af, (255, 0, 0), outline_w=5)
@@ -2133,13 +2139,13 @@ class Renderer:
                             txt, f, col, outline_w=5)
 
         sf = self._font(28)
-        st = "💀 100 BRAINROT BALLS • 1 SURVIVES 💀"
+        st = "100 BRAINROT BALLS - 1 SURVIVES"
         bbox_s = draw.textbbox((0, 0), st, font=sf)
         self._outlined_text(draw, ((w - bbox_s[2] + bbox_s[0]) // 2, h // 2 + 40),
                             st, sf, (255, 255, 255), outline_w=3)
 
         sf2 = self._font(20)
-        st2 = "🎲 7 RANDOM CHALLENGES THIS ROUND 🎲"
+        st2 = "7 RANDOM CHALLENGES THIS ROUND"
         bbox_s2 = draw.textbbox((0, 0), st2, font=sf2)
         self._outlined_text(draw, ((w - bbox_s2[2] + bbox_s2[0]) // 2, h // 2 + 82),
                             st2, sf2, (255, 200, 100), outline_w=2)
@@ -2178,7 +2184,7 @@ class Renderer:
 
         # "WINNER" text
         wf = self._font(72)
-        wt = "🏆 WINNER! 🏆"
+        wt = "★ WINNER! ★"
         bbox_w = draw.textbbox((0, 0), wt, font=wf)
         tw_w = bbox_w[2] - bbox_w[0]
         self._outlined_text(draw, ((w - tw_w) // 2, h // 4 - 20),
@@ -2216,7 +2222,7 @@ class Renderer:
 
         # Winner name
         nf = self._font(40)
-        nt = f"{winner.emoji} {winner.name} {winner.emoji}"
+        nt = f"[ {winner.name} ]"
         bbox_n = draw.textbbox((0, 0), nt, font=nf)
         tw_n = bbox_n[2] - bbox_n[0]
         self._outlined_text(draw, ((w - tw_n) // 2, cy_w + big_r + 35),
@@ -2224,7 +2230,7 @@ class Renderer:
 
         # Subtitle
         sf = self._font(28)
-        st = "💪 LAST BALL STANDING! 💪"
+        st = "** LAST BALL STANDING! **"
         bbox_s = draw.textbbox((0, 0), st, font=sf)
         tw_s = bbox_s[2] - bbox_s[0]
         self._outlined_text(draw, ((w - tw_s) // 2, cy_w + big_r + 85),
@@ -2232,13 +2238,13 @@ class Renderer:
 
         # Engagement hooks
         hf = self._font(24)
-        ht1 = "Did you guess right? Comment below! 👇"
+        ht1 = "Did you guess right? Comment below!"
         bbox_h1 = draw.textbbox((0, 0), ht1, font=hf)
         self._outlined_text(draw, ((w - bbox_h1[2] + bbox_h1[0]) // 2, h - 170),
                             ht1, hf, (255, 200, 100), outline_w=3)
 
         hf2 = self._font(22)
-        ht2 = "¿Adivinaste? Comenta tu favorito 👇"
+        ht2 = "Adivinaste? Comenta tu favorito!"
         bbox_h2 = draw.textbbox((0, 0), ht2, font=hf2)
         self._outlined_text(draw, ((w - bbox_h2[2] + bbox_h2[0]) // 2, h - 140),
                             ht2, hf2, (255, 180, 80), outline_w=2)
