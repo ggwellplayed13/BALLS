@@ -1,0 +1,15 @@
+name: Lint & Basic Check
+on: [push, pull_request]
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pyflakes
+      - run: python -m pyflakes CODE || true
+      - run: python -c "exec(open('CODE').read().split('if __name__')[0])" 2>&1 | head -50 || true
