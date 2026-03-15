@@ -2394,34 +2394,58 @@ class Renderer:
                             wt, wf, (255, 220, 50), outline_w=5)
 
         # Big winner ball
-        big_r = 60
+        big_r = 160
         cx_w = w // 2
         cy_w = h // 2
         bounce = int(abs(math.sin(frame * 0.15)) * 25)
         cy_w -= bounce
 
-        # Glow rings
-        for gr_i in range(big_r + 35, big_r, -3):
-            draw.ellipse([cx_w - gr_i, cy_w - gr_i, cx_w + gr_i, cy_w + gr_i],
-                         fill=winner.color)
+        # Glow rings (animated rainbow)
+        hue_ring = (frame * 0.02) % 1.0
+        for gr_i in range(big_r + 40, big_r, -4):
+            glow_hue = (hue_ring + (gr_i - big_r) / 120.0) % 1.0
+            gc_r, gc_g, gc_b = [int(c * 255) for c in
+                                  colorsys.hsv_to_rgb(glow_hue, 1.0, 1.0)]
+            alpha = int(180 * (gr_i - big_r) / 40)
+            glow_img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+            gd = ImageDraw.Draw(glow_img)
+            gd.ellipse([cx_w - gr_i, cy_w - gr_i, cx_w + gr_i, cy_w + gr_i],
+                       fill=(gc_r, gc_g, gc_b, alpha))
+            img = img.convert("RGBA")
+            img = Image.alpha_composite(img, glow_img)
+            img = img.convert("RGB")
 
-        draw.ellipse([cx_w - big_r, cy_w - big_r, cx_w + big_r, cy_w + big_r],
-                     fill=winner.color, outline=(255, 255, 255), width=4)
+        draw = ImageDraw.Draw(img)
 
-        # Winner character image — use full diameter (big_r * 2) to fill the ball
+        # Winner character image — scaled to fill the ENTIRE circle edge-to-edge
         char_img = self._character_images.get(winner.name)
         if char_img is not None:
-            icon_size_w = big_r * 2
-            icon_big = char_img.resize((icon_size_w, icon_size_w), Image.LANCZOS)
-            mask = Image.new("L", (icon_size_w, icon_size_w), 0)
+            diameter = big_r * 2
+            icon_big = char_img.resize((diameter, diameter), Image.LANCZOS)
+            # Circular mask so avatar fills edge-to-edge
+            mask = Image.new("L", (diameter, diameter), 0)
             mask_draw = ImageDraw.Draw(mask)
-            mask_draw.ellipse([0, 0, icon_size_w - 1, icon_size_w - 1], fill=255)
+            mask_draw.ellipse([0, 0, diameter - 1, diameter - 1], fill=255)
             px_w = cx_w - big_r
             py_w = cy_w - big_r
             try:
                 img.paste(icon_big, (px_w, py_w), mask)
             except Exception:
-                pass
+                # Fallback: draw a colored circle
+                draw = ImageDraw.Draw(img)
+                draw.ellipse([cx_w - big_r, cy_w - big_r,
+                               cx_w + big_r, cy_w + big_r],
+                              fill=winner.color)
+        else:
+            draw.ellipse([cx_w - big_r, cy_w - big_r,
+                           cx_w + big_r, cy_w + big_r],
+                          fill=winner.color)
+
+        # White border ring over the avatar
+        draw = ImageDraw.Draw(img)
+        draw.ellipse([cx_w - big_r, cy_w - big_r, cx_w + big_r, cy_w + big_r],
+                     outline=(255, 255, 255), width=5)
+
         draw = ImageDraw.Draw(img)
 
         # Winner name
@@ -2471,7 +2495,8 @@ class AudioGenerator:
     def generate(self, total_duration: float, winner_name: str,
                  countdown_dur: float,
                  death_times: List[float],
-                 challenge_times: List[float]) -> Optional[str]:
+                 challenge_times: List[float],
+                 winner_time: Optional[float] = None) -> Optional[str]:
         sr = 44100
         total_samples = int(total_duration * sr)
         audio = np.zeros(total_samples, dtype=np.float64)
@@ -2486,7 +2511,11 @@ class AudioGenerator:
 
         # Racing beat
         race_start = int(countdown_dur * sr)
-        race_end = int((total_duration - 6.0) * sr)
+        # race_end is exactly when the winner was detected (or fallback)
+        if winner_time is not None:
+            race_end = int(winner_time * sr)
+        else:
+            race_end = int((total_duration - 6.0) * sr)
         race_end = min(race_end, total_samples)
         bpm = 148
         beat_samples = int(60.0 / bpm * sr)
@@ -2723,14 +2752,17 @@ class BallBattleRoyale:
     def run(self) -> str:
         config = self.config
         fps = config.fps
-        total_frames = int(config.duration * fps)
+        # Use config.duration as pacing reference for arena shrink / challenge scheduling.
+        # The actual video duration is determined dynamically by when the winner is found.
+        # The 300s cap prevents an infinite loop if config.duration is very short.
+        max_frames = int(max(config.duration, 300) * fps)
         countdown_dur = 3.5
         countdown_frames = int(countdown_dur * fps)
         winner_dur = 6.0
 
         print(f"\n{'=' * 60}")
         print(f"  🔴 BRAINROT BATTLE ROYALE")
-        print(f"  Duration: {config.duration}s | FPS: {fps} | Frames: {total_frames}")
+        print(f"  Max duration: {config.duration}s | FPS: {fps} | Max frames: {max_frames}")
         print(f"{'=' * 60}\n")
 
         # ── Generate avatar images and assign names (no repeats per game) ──
@@ -2803,6 +2835,7 @@ class BallBattleRoyale:
 
         frame_data: List[Dict] = []
         winner: Optional[Ball] = None
+        winner_detected_frame: int = -1
         forced_kill_timer = 0
         death_times: List[float] = []
         challenge_times: List[float] = []
@@ -2822,8 +2855,12 @@ class BallBattleRoyale:
         original_bounce = config.bounce_damping
         original_margin = config.arena_margin_end
 
-        for frame in range(total_frames):
+        for frame in range(max_frames):
             t = frame / fps
+
+            # ── Early termination: stop after winner_dur seconds of winner phase ──
+            if winner_detected_frame >= 0 and frame >= winner_detected_frame + int(winner_dur * fps):
+                break
 
             if t < countdown_dur:
                 phase = "countdown"
@@ -2910,6 +2947,7 @@ class BallBattleRoyale:
                         last_dead = max(balls, key=lambda b: b.death_frame)
                         last_dead.alive = True
                         winner = last_dead
+                    winner_detected_frame = frame
                     print(f"🏆 WINNER: {winner.emoji} {winner.name} at t={t:.1f}s")
 
                 alive_count = sum(1 for b in balls if b.alive)
@@ -2939,7 +2977,7 @@ class BallBattleRoyale:
             frame_data.append(snapshot)
 
             if frame % (fps * 5) == 0:
-                print(f"  Frame {frame}/{total_frames} | t={t:.1f}s | alive={alive_count}")
+                print(f"  Frame {frame}/{max_frames} | t={t:.1f}s | alive={alive_count}")
 
         if winner is None:
             alive_list = [b for b in balls if b.alive]
@@ -2948,9 +2986,12 @@ class BallBattleRoyale:
             else:
                 winner = max(balls, key=lambda b: b.death_frame)
                 winner.alive = True
+            winner_detected_frame = max(0, len(frame_data) - int(winner_dur * fps) - 1)
             print(f"🏆 WINNER (time limit): {winner.emoji} {winner.name}")
 
-        print(f"\n✅ Simulation: {len(frame_data)} frames, {len(death_times)} deaths")
+        actual_duration = len(frame_data) / fps
+        winner_time = winner_detected_frame / fps if winner_detected_frame >= 0 else max(0.0, actual_duration - winner_dur)
+        print(f"\n✅ Simulation: {len(frame_data)} frames ({actual_duration:.1f}s), {len(death_times)} deaths")
         gc.collect()
 
         config.bounce_damping = original_bounce
@@ -2960,8 +3001,8 @@ class BallBattleRoyale:
         print("🔊 Generating audio...")
         audio_gen = AudioGenerator(config)
         audio_path = audio_gen.generate(
-            config.duration, winner.name, countdown_dur,
-            death_times, challenge_times)
+            actual_duration, winner.name, countdown_dur,
+            death_times, challenge_times, winner_time)
 
         # ── Encode video ──
         print("🎬 Encoding video...")
@@ -3014,13 +3055,13 @@ class BallBattleRoyale:
         output_path = os.path.join(config.output_dir,
                                     f"brainrot_battle_{timestamp}_{rand_suffix}.mp4")
 
-        video_clip = VideoClip(make_frame, duration=config.duration).set_fps(fps)
+        video_clip = VideoClip(make_frame, duration=actual_duration).set_fps(fps)
 
         if audio_path and os.path.exists(audio_path):
             try:
                 audio_clip = AudioFileClip(audio_path)
-                if audio_clip.duration > config.duration:
-                    audio_clip = audio_clip.subclip(0, config.duration)
+                if audio_clip.duration > actual_duration:
+                    audio_clip = audio_clip.subclip(0, actual_duration)
                 video_clip = video_clip.set_audio(audio_clip)
                 print("✅ Audio attached.")
             except Exception as e:
