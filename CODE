@@ -737,8 +737,8 @@ class Ball:
         self.death_frame = -1
         self.trail: List[Tuple[float, float]] = []
         self.name = character["name"]
-        self.emoji = character["emoji"]
-        self.symbol = character["symbol"]
+        self.emoji = character.get("emoji", "[?]")
+        self.symbol = character.get("symbol", character["name"][:2].upper())
         self.flash_timer = 0.0
         self.invincible_timer = 0.0
         self.character = character
@@ -1119,7 +1119,7 @@ def _ch_death_wall(balls, arena, hazards, rng, config, **kw):
 @_register("SHOCKWAVE BLAST", "[BOOM]", "shockwave")
 def _ch_shockwave(balls, arena, hazards, rng, config, **kw):
     ax1, ay1, ax2, ay2 = arena
-    thick = min(rng.uniform(10, 18), 18)
+    thick = rng.uniform(10, 18)
     # Cap max_radius to 40% of the smaller arena dimension to avoid killing everyone
     arena_min = min(ax2 - ax1, ay2 - ay1)
     hazards.shockwaves.append(Shockwave(
@@ -1128,7 +1128,7 @@ def _ch_shockwave(balls, arena, hazards, rng, config, **kw):
         speed=rng.uniform(2.5, 5.0),
         max_radius=arena_min * rng.uniform(0.30, 0.40),
         thickness=thick,
-        kill_thickness=min(thick, 18),
+        kill_thickness=thick,
         color=(255, 255, rng.randint(50, 200)),
     ))
 
