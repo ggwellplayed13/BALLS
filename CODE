@@ -270,13 +270,13 @@ print(f"✅ {len(BRAINROT_CHARACTERS)} brainrot characters loaded.")
 # ═══════════════════════════════════════════════════════════════════════════════
 
 def download_character_images(characters: List[Dict], cache_dir: str,
-                              icon_size: int = 64) -> Dict[str, Image.Image]:
-    """Intenta descargar un avatar para cada personaje desde DuckDuckGo o
-    genera un icono fallback con su emoji/símbolo."""
+                              icon_size: int = 96) -> Dict[str, Image.Image]:
+    """Descarga un avatar para cada personaje.
+    Intenta en orden: ui-avatars.com (texto+color), robohash set1, fallback icon."""
     os.makedirs(cache_dir, exist_ok=True)
     images: Dict[str, Image.Image] = {}
 
-    print("🖼️ Descargando imágenes de personajes...")
+    print("Descargando imágenes de personajes...")
     for i, char in enumerate(characters):
         name = char["name"]
         cache_path = os.path.join(cache_dir,
@@ -295,13 +295,21 @@ def download_character_images(characters: List[Dict], cache_dir: str,
         # Intentar descargar
         downloaded = False
 
-        # Try direct img_url first (real character image)
-        img_url_direct = char.get("img_url", "")
-        if img_url_direct and not downloaded:
+        # 1st try: ui-avatars.com — colored text avatar with character initials
+        if not downloaded:
             try:
-                resp = requests.get(img_url_direct, timeout=8,
+                hue = char.get("hue", 0.5)
+                r_c, g_c, b_c = [int(c * 255)
+                                  for c in colorsys.hsv_to_rgb(hue, 0.75, 0.85)]
+                hex_bg = f"{r_c:02x}{g_c:02x}{b_c:02x}"
+                ua_url = (
+                    f"https://ui-avatars.com/api/?name={quote(name)}"
+                    f"&size={icon_size}&background={hex_bg}"
+                    f"&color=fff&bold=true&format=png"
+                )
+                resp = requests.get(ua_url, timeout=8,
                                     headers={"User-Agent": "Mozilla/5.0"})
-                if resp.status_code == 200 and len(resp.content) > 500:
+                if resp.status_code == 200 and len(resp.content) > 200:
                     img = Image.open(io.BytesIO(resp.content)).convert("RGBA")
                     img = img.resize((icon_size, icon_size), Image.LANCZOS)
                     img.save(cache_path)
@@ -310,10 +318,11 @@ def download_character_images(characters: List[Dict], cache_dir: str,
             except Exception:
                 pass
 
-        # Fallback: robohash (generates unique avatar per name)
+        # 2nd try: robohash set1 (robots look better than set4 cats)
         if not downloaded:
             try:
-                url = f"https://robohash.org/{quote(name)}?size={icon_size}x{icon_size}&set=set4"
+                url = (f"https://robohash.org/{quote(name)}"
+                       f"?size={icon_size}x{icon_size}&set=set1")
                 resp = requests.get(url, timeout=5)
                 if resp.status_code == 200 and len(resp.content) > 500:
                     img = Image.open(io.BytesIO(resp.content)).convert("RGBA")
@@ -331,7 +340,7 @@ def download_character_images(characters: List[Dict], cache_dir: str,
         if (i + 1) % 20 == 0:
             print(f"   {i + 1}/{len(characters)} procesados...")
 
-    print(f"✅ {len(images)} imágenes de personajes listas.")
+    print(f"[OK] {len(images)} imágenes de personajes listas.")
     return images
 
 
@@ -1434,8 +1443,10 @@ class Renderer:
         # Screen shake offset
         shake_x, shake_y = 0, 0
         if self._screen_shake > 0.5:
-            shake_x = int(random.uniform(-self._screen_shake, self._screen_shake))
-            shake_y = int(random.uniform(-self._screen_shake, self._screen_shake))
+            # Use frame-seeded RNG for deterministic shake offsets
+            shake_rng = random.Random(frame * 99991)
+            shake_x = int(shake_rng.uniform(-self._screen_shake, self._screen_shake))
+            shake_y = int(shake_rng.uniform(-self._screen_shake, self._screen_shake))
             self._screen_shake *= 0.88
 
         # Background
@@ -1563,6 +1574,9 @@ class Renderer:
                 except Exception:
                     pass
 
+        # Refresh draw context after paste so subsequent draw calls work correctly
+        draw = ImageDraw.Draw(img)
+
         # Ball outline drawn AFTER image paste
         draw.ellipse([x - r, y - r, x + r, y + r],
                      outline=ball.outline_color,
@@ -1587,13 +1601,16 @@ class Renderer:
                         arena: Tuple[int, int, int, int],
                         frame: int, t: float):
         ax1, ay1, ax2, ay2 = arena
+        # Use a frame-seeded RNG for all render-time random effects so the
+        # visual output is deterministic and doesn't flicker between renders.
+        render_rng = random.Random(frame * 31337)
 
         # ── Lava Zones ──
         for lz in hazards.lava_zones:
             if lz.thickness <= 0:
                 continue
             th = int(lz.thickness)
-            flicker = int(random.uniform(-8, 8))
+            flicker = int(render_rng.uniform(-8, 8))
             in_warmup = lz.warmup_frames > 0
             if in_warmup:
                 # During warmup: show as dark orange/yellow warning, not lethal
@@ -1644,18 +1661,18 @@ class Renderer:
             if th > 5:
                 for _ in range(3):
                     if lz.side == "bottom":
-                        bx = random.randint(ax1 + 5, max(ax1 + 6, ax2 - 5))
-                        by = ay2 - random.randint(2, max(3, th))
+                        bx = render_rng.randint(ax1 + 5, max(ax1 + 6, ax2 - 5))
+                        by = ay2 - render_rng.randint(2, max(3, th))
                     elif lz.side == "top":
-                        bx = random.randint(ax1 + 5, max(ax1 + 6, ax2 - 5))
-                        by = ay1 + random.randint(2, max(3, th))
+                        bx = render_rng.randint(ax1 + 5, max(ax1 + 6, ax2 - 5))
+                        by = ay1 + render_rng.randint(2, max(3, th))
                     elif lz.side == "left":
-                        bx = ax1 + random.randint(2, max(3, th))
-                        by = random.randint(ay1 + 5, max(ay1 + 6, ay2 - 5))
+                        bx = ax1 + render_rng.randint(2, max(3, th))
+                        by = render_rng.randint(ay1 + 5, max(ay1 + 6, ay2 - 5))
                     else:
-                        bx = ax2 - random.randint(2, max(3, th))
-                        by = random.randint(ay1 + 5, max(ay1 + 6, ay2 - 5))
-                    bbr = random.randint(2, 5)
+                        bx = ax2 - render_rng.randint(2, max(3, th))
+                        by = render_rng.randint(ay1 + 5, max(ay1 + 6, ay2 - 5))
+                    bbr = render_rng.randint(2, 5)
                     draw.ellipse([bx - bbr, by - bbr, bx + bbr, by + bbr],
                                  fill=(255, 220, 80))
 
@@ -2205,15 +2222,16 @@ class Renderer:
         draw.ellipse([cx_w - big_r, cy_w - big_r, cx_w + big_r, cy_w + big_r],
                      fill=winner.color, outline=(255, 255, 255), width=4)
 
-        # Winner character image
+        # Winner character image — use full diameter (big_r * 2) to fill the ball
         char_img = self._character_images.get(winner.name)
         if char_img is not None:
-            icon_big = char_img.resize((big_r, big_r), Image.LANCZOS)
-            mask = Image.new("L", (big_r, big_r), 0)
+            icon_size_w = big_r * 2
+            icon_big = char_img.resize((icon_size_w, icon_size_w), Image.LANCZOS)
+            mask = Image.new("L", (icon_size_w, icon_size_w), 0)
             mask_draw = ImageDraw.Draw(mask)
-            mask_draw.ellipse([0, 0, big_r - 1, big_r - 1], fill=255)
-            px_w = cx_w - big_r // 2
-            py_w = cy_w - big_r // 2
+            mask_draw.ellipse([0, 0, icon_size_w - 1, icon_size_w - 1], fill=255)
+            px_w = cx_w - big_r
+            py_w = cy_w - big_r
             try:
                 img.paste(icon_big, (px_w, py_w), mask)
             except Exception:
@@ -2540,7 +2558,7 @@ class BallBattleRoyale:
 
         all_used_chars = list({c["name"]: c for c in assigned_chars}.values())
         character_images = download_character_images(
-            all_used_chars, config.image_cache_dir, icon_size=64)
+            all_used_chars, config.image_cache_dir, icon_size=96)
 
         # ── Select challenges ──
         available_categories: Set[str] = set()
