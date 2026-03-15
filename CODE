@@ -46,335 +46,517 @@ from pydub import AudioSegment
 print("✅ All imports loaded.")
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# SECTION 2 — BRAINROT CHARACTERS DATABASE (ACTUALIZADO 2025-2026)
+# SECTION 2 — BRAINROT NAME POOL (200+ names for random assignment)
 # ═══════════════════════════════════════════════════════════════════════════════
 
-BRAINROT_CHARACTERS: List[Dict[str, Any]] = [
-    # ── Italian Brainrot (viral 2025-2026) ──
-    {"name": "Tralalero Tralala",     "emoji": "[SHARK]", "hue": 0.58, "symbol": "Tr",
-     "img_query": "tralalero+tralala+shark+meme"},
-    {"name": "Bombardino Crocodilo",  "emoji": "[CROC]", "hue": 0.35, "symbol": "Bo",
-     "img_query": "bombardino+crocodilo+meme"},
-    {"name": "Tung Tung Sahur",       "emoji": "[DRUM]", "hue": 0.07, "symbol": "TT",
-     "img_query": "tung+tung+tung+sahur+meme"},
-    {"name": "Ballerina Cappuccina",  "emoji": "[CAFFE]", "hue": 0.08, "symbol": "BC",
-     "img_query": "ballerina+cappuccina+meme"},
-    {"name": "Lirili Larila",         "emoji": "[CACTUS]", "hue": 0.33, "symbol": "LL",
-     "img_query": "lirili+larila+cactus+elephant+meme"},
-    {"name": "Brr Brr Patapim",       "emoji": "[COLD]", "hue": 0.55, "symbol": "BP",
-     "img_query": "brr+brr+patapim+meme"},
-    {"name": "Chimpanzini Bananini",  "emoji": "[BANANA]", "hue": 0.15, "symbol": "CB",
-     "img_query": "chimpanzini+bananini+meme"},
-    {"name": "Boneca Ambalabu",       "emoji": "[FROG]", "hue": 0.33, "symbol": "BA",
-     "img_query": "boneca+ambalabu+meme"},
-    {"name": "Capuccino Assassino",   "emoji": "[SKULL]", "hue": 0.07, "symbol": "CA",
-     "img_query": "capuccino+assassino+meme"},
-    {"name": "Frigo Camelo",          "emoji": "[CAMEL]", "hue": 0.55, "symbol": "FC",
-     "img_query": "frigo+camelo+meme"},
-    {"name": "Trippi Troppi",         "emoji": "[MUSH]", "hue": 0.80, "symbol": "TrT",
-     "img_query": "trippi+troppi+mushroom+brainrot"},
-    {"name": "La Vaca Saturno",       "emoji": "[COW]", "hue": 0.70, "symbol": "VS",
-     "img_query": "la+vaca+saturno+saturnita+meme"},
-    {"name": "Glorbo",                "emoji": "[ALIEN]", "hue": 0.45, "symbol": "Gl",
-     "img_query": "glorbo+brainrot+meme"},
-    {"name": "Bombombini Gusini",     "emoji": "[GOOSE]", "hue": 0.15, "symbol": "BG",
-     "img_query": "bombombini+gusini+meme"},
-    {"name": "Cocofanto",             "emoji": "[COCO]", "hue": 0.10, "symbol": "Co",
-     "img_query": "cocofanto+brainrot+meme"},
-    # ── Skibidi / Classic Brainrot ──
-    {"name": "Skibidi Toilet",        "emoji": "[TOILET]", "hue": 0.55, "symbol": "ST",
-     "img_query": "skibidi+toilet+meme"},
-    {"name": "Cameraman",             "emoji": "[CAM]", "hue": 0.10, "symbol": "Cm",
-     "img_query": "skibidi+cameraman+meme"},
-    {"name": "Speakerman",            "emoji": "[SPKR]", "hue": 0.60, "symbol": "Sp",
-     "img_query": "skibidi+speakerman+meme"},
-    {"name": "TV Man",                "emoji": "[TV]", "hue": 0.75, "symbol": "TV",
-     "img_query": "skibidi+tv+man+meme"},
-    {"name": "Titan Cameraman",       "emoji": "[TITAN]", "hue": 0.55, "symbol": "Ti",
-     "img_query": "titan+cameraman+skibidi"},
-    {"name": "Plungerman",            "emoji": "[PLUNGE]", "hue": 0.05, "symbol": "Pl",
-     "img_query": "plungerman+skibidi+meme"},
-    # ── Sigma / Rizz / Streamer Brainrot ──
-    {"name": "Sigma Boy",             "emoji": "[SIGMA]", "hue": 0.00, "symbol": "σ",
-     "img_query": "sigma+boy+meme"},
-    {"name": "Rizz God",              "emoji": "[RIZZ]", "hue": 0.08, "symbol": "Rz",
-     "img_query": "rizz+god+meme"},
-    {"name": "Rizzler",               "emoji": "[RIZZLER]", "hue": 0.90, "symbol": "Ri",
-     "img_query": "the+rizzler+baby+meme"},
-    {"name": "Giga Chad",             "emoji": "[CHAD]", "hue": 0.00, "symbol": "GC",
-     "img_query": "gigachad+meme", "img_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Gigachad.jpg/240px-Gigachad.jpg"},
-    {"name": "John Pork",             "emoji": "[PORK]", "hue": 0.95, "symbol": "JP",
-     "img_query": "john+pork+calling+meme"},
-    {"name": "Grimace Shake",         "emoji": "[GRIMACE]", "hue": 0.78, "symbol": "GS",
-     "img_query": "grimace+shake+meme"},
-    {"name": "Smurf Cat",             "emoji": "[SMURF]", "hue": 0.58, "symbol": "SC",
-     "img_query": "smurf+cat+meme+blue"},
-    {"name": "Ohio Boss",             "emoji": "[OHIO]", "hue": 0.00, "symbol": "OH",
-     "img_query": "only+in+ohio+boss+meme"},
-    {"name": "Gyatt King",            "emoji": "[GYATT]", "hue": 0.12, "symbol": "GK",
-     "img_query": "gyatt+meme+king"},
-    {"name": "Hawk Tuah",             "emoji": "[HAWK]", "hue": 0.07, "symbol": "HT",
-     "img_query": "hawk+tuah+girl+meme"},
-    {"name": "Kai Cenat",             "emoji": "[KAI]", "hue": 0.70, "symbol": "KC",
-     "img_query": "kai+cenat+meme"},
-    {"name": "Speed",                 "emoji": "[SPEED]", "hue": 0.12, "symbol": "IS",
-     "img_query": "ishowspeed+meme+face"},
-    {"name": "Caseoh",                "emoji": "[CASE]", "hue": 0.06, "symbol": "Ca",
-     "img_query": "caseoh+meme"},
-    {"name": "Fanum Tax",             "emoji": "[FANUM]", "hue": 0.14, "symbol": "FT",
-     "img_query": "fanum+tax+meme"},
-    {"name": "Duke Dennis",           "emoji": "[DUKE]", "hue": 0.28, "symbol": "DD",
-     "img_query": "duke+dennis+meme"},
-    {"name": "Baby Gronk",            "emoji": "[GRONK]", "hue": 0.08, "symbol": "BaG",
-     "img_query": "baby+gronk+meme"},
-    # ── Classic Internet / Gaming Brainrot ──
-    {"name": "Quandale Dingle",       "emoji": "[QD]", "hue": 0.30, "symbol": "QD",
-     "img_query": "quandale+dingle+face+meme"},
-    {"name": "Amogus",                "emoji": "[SUS]", "hue": 0.00, "symbol": "SU",
-     "img_query": "amogus+sus+meme", "img_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Among_Us_cover_art.jpg/240px-Among_Us_cover_art.jpg"},
-    {"name": "Freddy Fazbear",        "emoji": "[FREDDY]", "hue": 0.07, "symbol": "FF",
-     "img_query": "freddy+fazbear+meme"},
-    {"name": "Doge",                  "emoji": "[DOGE]", "hue": 0.12, "symbol": "Do",
-     "img_query": "doge+shiba+meme", "img_url": "https://upload.wikimedia.org/wikipedia/en/5/5f/Original_Doge_meme.jpg"},
-    {"name": "Pepe",                  "emoji": "[PEPE]", "hue": 0.33, "symbol": "Pe",
-     "img_query": "pepe+frog+meme", "img_url": "https://upload.wikimedia.org/wikipedia/en/a/a7/Pepe_the_Frog.png"},
-    {"name": "Nyan Cat",              "emoji": "[NYAN]", "hue": 0.80, "symbol": "NC",
-     "img_query": "nyan+cat+meme"},
-    {"name": "Big Chungus",           "emoji": "[CHUNGUS]", "hue": 0.45, "symbol": "BC2",
-     "img_query": "big+chungus+meme"},
-    {"name": "Ugandan Knuckles",      "emoji": "[UGANDA]", "hue": 0.00, "symbol": "UK",
-     "img_query": "ugandan+knuckles+meme"},
-    {"name": "Sans Undertale",        "emoji": "[SANS]", "hue": 0.60, "symbol": "Sa",
-     "img_query": "sans+undertale+meme"},
-    {"name": "Sonic",                 "emoji": "[SONIC]", "hue": 0.58, "symbol": "So",
-     "img_query": "sonic+meme+face", "img_url": "https://upload.wikimedia.org/wikipedia/en/b/bf/Sonicthehedgehog.png"},
-    {"name": "Creeper",               "emoji": "[CREEPER]", "hue": 0.33, "symbol": "Cr",
-     "img_query": "creeper+minecraft+meme"},
-    {"name": "Steve MC",              "emoji": "[STEVE]", "hue": 0.55, "symbol": "SM",
-     "img_query": "steve+minecraft+face+meme"},
-    {"name": "Drip Goku",             "emoji": "[GOKU]", "hue": 0.58, "symbol": "DG",
-     "img_query": "drip+goku+meme"},
-    {"name": "Shrek",                 "emoji": "[SHREK]", "hue": 0.33, "symbol": "Sh",
-     "img_query": "shrek+face+meme", "img_url": "https://upload.wikimedia.org/wikipedia/en/1/14/Shrek.jpg"},
-    {"name": "Spongebob",             "emoji": "[SPONGE]", "hue": 0.15, "symbol": "SB",
-     "img_query": "spongebob+mocking+meme"},
-    {"name": "Walter White",          "emoji": "[WALTER]", "hue": 0.40, "symbol": "WW",
-     "img_query": "walter+white+heisenberg+meme"},
-    {"name": "Rick Astley",           "emoji": "[RICK]", "hue": 0.00, "symbol": "RA",
-     "img_query": "rick+astley+rickroll+meme"},
-    {"name": "Mr Beast",              "emoji": "[BEAST]", "hue": 0.55, "symbol": "MrB",
-     "img_query": "mrbeast+meme+face"},
-    {"name": "Hasbulla",              "emoji": "[HASBULLA]", "hue": 0.08, "symbol": "Ha",
-     "img_query": "hasbulla+meme+face"},
-    {"name": "Toothless Dance",       "emoji": "[TOOTHLESS]", "hue": 0.70, "symbol": "TL",
-     "img_query": "toothless+dance+meme"},
-    {"name": "Pingu",                 "emoji": "[PINGU]", "hue": 0.55, "symbol": "Pg",
-     "img_query": "pingu+noot+noot+meme"},
-    {"name": "Goofy Ahh",             "emoji": "[GOOFY]", "hue": 0.02, "symbol": "GA",
-     "img_query": "goofy+ahh+meme"},
-    {"name": "Peter Griffin",         "emoji": "[PETER]", "hue": 0.55, "symbol": "PG",
-     "img_query": "peter+griffin+meme+face"},
-    {"name": "Morbius",               "emoji": "[MORB]", "hue": 0.78, "symbol": "MB",
-     "img_query": "morbius+morbin+time+meme"},
-    {"name": "Thanos",                "emoji": "[THANOS]", "hue": 0.78, "symbol": "Th",
-     "img_query": "thanos+snap+meme"},
-    {"name": "Dababy",                "emoji": "[DABABY]", "hue": 0.55, "symbol": "DB",
-     "img_query": "dababy+lets+go+meme"},
-    {"name": "Stonks",                "emoji": "[STONKS]", "hue": 0.33, "symbol": "St",
-     "img_query": "stonks+meme+man"},
-    {"name": "Bingus",                "emoji": "[BINGUS]", "hue": 0.95, "symbol": "Bi",
-     "img_query": "bingus+cat+meme"},
-    {"name": "Floppa",                "emoji": "[FLOPPA]", "hue": 0.08, "symbol": "Fl",
-     "img_query": "floppa+big+floppa+meme"},
-    {"name": "Juan Horse",            "emoji": "[JUAN]", "hue": 0.07, "symbol": "Ju",
-     "img_query": "juan+horse+balcony+meme"},
-    {"name": "NPC Man",               "emoji": "[NPC]", "hue": 0.45, "symbol": "NP",
-     "img_query": "npc+meme+man"},
-    {"name": "Mewing Master",         "emoji": "[MEWING]", "hue": 0.55, "symbol": "MW",
-     "img_query": "mewing+meme"},
-    {"name": "Pibby",                 "emoji": "[PIBBY]", "hue": 0.62, "symbol": "Pi",
-     "img_query": "pibby+glitch+meme"},
-    {"name": "Waluigi",               "emoji": "[WALU]", "hue": 0.75, "symbol": "Wa",
-     "img_query": "waluigi+meme"},
-    {"name": "Luigi Death Stare",     "emoji": "[LUIGI]", "hue": 0.35, "symbol": "Lu",
-     "img_query": "luigi+death+stare+meme"},
-    {"name": "Enderman",              "emoji": "[ENDER]", "hue": 0.78, "symbol": "En",
-     "img_query": "enderman+minecraft+meme"},
-    {"name": "Patrick Star",          "emoji": "[PATRICK]", "hue": 0.95, "symbol": "PS",
-     "img_query": "patrick+star+meme"},
-    {"name": "Vibe Check",            "emoji": "[VIBE]", "hue": 0.33, "symbol": "VC",
-     "img_query": "vibe+check+meme"},
-    {"name": "Skill Issue",           "emoji": "[SKILL]", "hue": 0.00, "symbol": "SI",
-     "img_query": "skill+issue+meme"},
-    {"name": "Caught in 4K",          "emoji": "[4K]", "hue": 0.55, "symbol": "4K",
-     "img_query": "caught+in+4k+meme"},
-    {"name": "Sus Baka",              "emoji": "[SUSBAKA]", "hue": 0.00, "symbol": "SBa",
-     "img_query": "sus+baka+meme"},
-    {"name": "Edging Expert",         "emoji": "[EDGE]", "hue": 0.55, "symbol": "EE",
-     "img_query": "edging+meme+brainrot"},
-    {"name": "Ratio King",            "emoji": "[RATIO]", "hue": 0.60, "symbol": "RK",
-     "img_query": "ratio+meme+twitter"},
-    {"name": "W Holder",              "emoji": "[W]", "hue": 0.14, "symbol": "WH",
-     "img_query": "w+meme+holding"},
-    {"name": "Cope Lord",             "emoji": "[COPE]", "hue": 0.02, "symbol": "CL",
-     "img_query": "cope+seethe+meme"},
-    {"name": "Blud",                  "emoji": "[BLUD]", "hue": 0.00, "symbol": "Bl",
-     "img_query": "blud+meme+skull"},
-    {"name": "Bruh Moment",           "emoji": "[BRUH]", "hue": 0.45, "symbol": "BM",
-     "img_query": "bruh+moment+meme"},
-    {"name": "Based King",            "emoji": "[BASED]", "hue": 0.12, "symbol": "BK",
-     "img_query": "based+chad+meme"},
-    {"name": "Touch Grass",           "emoji": "[GRASS]", "hue": 0.33, "symbol": "TG",
-     "img_query": "touch+grass+meme"},
-    {"name": "Yeet Champion",         "emoji": "[YEET]", "hue": 0.55, "symbol": "YC",
-     "img_query": "yeet+meme"},
-    {"name": "Main Character",        "emoji": "[MAIN]", "hue": 0.70, "symbol": "MC",
-     "img_query": "main+character+energy+meme"},
-    {"name": "Plot Armor",            "emoji": "[PLOT]", "hue": 0.55, "symbol": "PA",
-     "img_query": "plot+armor+meme+anime"},
-    {"name": "Did You Pray",          "emoji": "[PRAY]", "hue": 0.45, "symbol": "DP",
-     "img_query": "did+you+pray+today+meme"},
-    {"name": "Ayo?!",                 "emoji": "[AYO]", "hue": 0.08, "symbol": "AY",
-     "img_query": "ayo+sus+meme"},
-    {"name": "It's Corn",             "emoji": "[CORN]", "hue": 0.15, "symbol": "IC",
-     "img_query": "its+corn+kid+meme"},
-    {"name": "Glizzy Gobbler",        "emoji": "[GLIZZY]", "hue": 0.10, "symbol": "GG",
-     "img_query": "glizzy+gobbler+meme"},
-    {"name": "Dream",                 "emoji": "[DREAM]", "hue": 0.33, "symbol": "Dr",
-     "img_query": "dream+smp+smile+meme"},
-    {"name": "Baby Shark",            "emoji": "[BSHARK]", "hue": 0.55, "symbol": "BS",
-     "img_query": "baby+shark+meme"},
-    {"name": "Shadow",                "emoji": "[SHADOW]", "hue": 0.00, "symbol": "Shd",
-     "img_query": "shadow+hedgehog+meme"},
-    {"name": "Ankha Zone",            "emoji": "[ANKHA]", "hue": 0.12, "symbol": "AZ",
-     "img_query": "ankha+zone+meme"},
-    {"name": "Jellybean",             "emoji": "[JELLY]", "hue": 0.85, "symbol": "JB",
-     "img_query": "jellybean+youtuber+meme"},
-    {"name": "No Cap",                "emoji": "[NOCAP]", "hue": 0.55, "symbol": "NCp",
-     "img_query": "no+cap+meme"},
-    {"name": "Bussin Boy",            "emoji": "[BUSSIN]", "hue": 0.10, "symbol": "BB",
-     "img_query": "bussin+meme+food"},
-    {"name": "Livvy Dunne",           "emoji": "[LIVVY]", "hue": 0.90, "symbol": "LD",
-     "img_query": "livvy+dunne+meme"},
-    {"name": "Gigachad Jr",           "emoji": "[GJ]", "hue": 0.00, "symbol": "GJ",
-     "img_query": "gigachad+junior+meme"},
-    {"name": "Tim Cheese",            "emoji": "[TIM]", "hue": 0.15, "symbol": "TC",
-     "img_query": "tim+cheese+meme+brainrot"},
+BRAINROT_NAMES: List[str] = [
+    # Italian Brainrot 2025-2026
+    "Tralalero Tralala", "Bombardino Crocodilo", "Tung Tung Sahur",
+    "Ballerina Cappuccina", "Lirili Larila", "Brr Brr Patapim",
+    "Chimpanzini Bananini", "Boneca Ambalabu", "Capuccino Assassino",
+    "Frigo Camelo", "Trippi Troppi", "La Vaca Saturno", "Glorbo",
+    "Bombombini Gusini", "Cocofanto", "Frulli Frullino", "Brrr Brrr",
+    "Cappuccino Sicario", "Girafa Celeste", "Pinguino Saltarino",
+    # Skibidi universe
+    "Skibidi Toilet", "Cameraman", "Speakerman", "TV Man",
+    "Titan Cameraman", "Plungerman", "G-Man", "Toilet Hybrid",
+    # Sigma / Rizz / Streamer
+    "Sigma Boy", "Rizz God", "Rizzler", "Giga Chad", "John Pork",
+    "Grimace Shake", "Smurf Cat", "Ohio Boss", "Gyatt King", "Hawk Tuah",
+    "Kai Cenat", "Speed", "Caseoh", "Fanum Tax", "Duke Dennis",
+    "Baby Gronk", "Quandale Dingle",
+    # Classic internet
+    "Amogus", "Freddy Fazbear", "Doge", "Pepe", "Nyan Cat",
+    "Big Chungus", "Ugandan Knuckles", "Sans Undertale", "Sonic",
+    "Creeper", "Steve MC", "Drip Goku", "Shrek", "Spongebob",
+    "Walter White", "Rick Astley", "Mr Beast", "Hasbulla",
+    "Toothless Dance", "Pingu", "Goofy Ahh", "Peter Griffin",
+    "Morbius", "Thanos", "Dababy", "Stonks", "Bingus", "Floppa",
+    "Juan Horse", "NPC Man", "Mewing Master", "Pibby", "Waluigi",
+    "Luigi Death Stare", "Enderman", "Patrick Star", "Vibe Check",
+    "Skill Issue", "Caught in 4K", "Sus Baka", "Edging Expert",
+    "Ratio King", "W Holder", "Cope Lord", "Blud", "Bruh Moment",
+    "Based King", "Touch Grass", "Yeet Champion", "Main Character",
+    "Plot Armor", "Did You Pray", "Ayo?!", "It's Corn",
+    "Glizzy Gobbler", "Dream", "Baby Shark", "Shadow", "Ankha Zone",
+    "Jellybean", "No Cap", "Bussin Boy", "Livvy Dunne", "Gigachad Jr",
+    "Tim Cheese",
+    # Extra brainrot names
+    "Sigma Grindset", "NPC Energy", "Rizz Master", "Ohio Kid",
+    "Skibidi Boy", "Gyatt Mode", "Bussin Hard", "Slay Queen",
+    "Vibe King", "Ratio Lord", "Cap Free", "Touch Grass Bro",
+    "Mew Lord", "Looksmax God", "Delulu King", "Ick Factor",
+    "Understood Assignment", "No Printer", "Understood Nothing",
+    "Rent Free", "Living Rent Free", "Core Memory", "Roman Empire",
+    "Understood The Assignment", "Main Character Syndrome",
+    "Down Bad", "Caught Lacking", "Different Breed", "Built Different",
+    "Understood King", "Glazing Bro", "Twin", "Bestie", "Ate That",
+    "Snatched", "Understood That", "Pressed", "Rizz Unlocked",
+    "Girlboss", "Gaslight King", "Gatekeep God", "Girlmath Pro",
+    "Delulu Is Solulu", "Understood The Vibe", "Rizz No Cap",
+    "Understood Sigma", "NPC Detected", "Understood Ohio",
+    "Literal Goat", "Understood Bussin", "Understood Slay",
+    "Hawk Tua Gurl", "Understood Gyatt", "Rizz Understood",
+    "Core Understood", "That Girl", "That Boy", "Understood Twin",
+    "The Goat", "The Sigma", "The NPC", "The Rizzler",
+    "The Based One", "The Cope King", "The W Guy", "The L Guy",
+    "The Bruh", "The Blud", "The Yeet", "The Skibidi",
+    "The Ohio Man", "The Gyatt", "The Bussin", "The Slay",
+    "Top G", "Bottom G", "Side G", "Mr Sussy", "Mr Based",
+    "Mr Sigma", "Mr Rizz", "Mr NPC", "Mr Brainrot",
+    "Dr Skibidi", "Dr Ohio", "Dr Gyatt", "Dr Rizz",
+    "Prof Sigma", "Prof NPC", "Prof Brainrot",
+    "King Brainrot", "Queen Brainrot", "Prince Brainrot",
+    "Lord Ratio", "Duke Cope", "Baron Cap", "Sir No Cap",
+    "Captain Sigma", "Admiral Rizz", "General Gyatt",
+    "Agent Ohio", "Officer NPC", "Sergeant Skibidi",
 ]
 
-print(f"✅ {len(BRAINROT_CHARACTERS)} brainrot characters loaded.")
+# Keep a BRAINROT_CHARACTERS alias for backward-compat (used to build balls list)
+BRAINROT_CHARACTERS: List[Dict[str, Any]] = [
+    {"name": n} for n in BRAINROT_NAMES
+]
+
+print(f"[OK] {len(BRAINROT_NAMES)} brainrot names loaded.")
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# SECTION 3 — IMAGE DOWNLOADER (descarga imágenes reales de los personajes)
+# SECTION 3 — PURE-CODE AVATAR GENERATOR (200+ unique images, no downloads)
 # ═══════════════════════════════════════════════════════════════════════════════
 
-def download_character_images(characters: List[Dict], cache_dir: str,
-                              icon_size: int = 96) -> Dict[str, Image.Image]:
-    """Descarga un avatar para cada personaje.
-    Intenta en orden: ui-avatars.com (texto+color), robohash set1, fallback icon."""
-    os.makedirs(cache_dir, exist_ok=True)
-    images: Dict[str, Image.Image] = {}
-
-    print("Descargando imágenes de personajes...")
-    for i, char in enumerate(characters):
-        name = char["name"]
-        cache_path = os.path.join(cache_dir,
-                                   f"{hashlib.md5(name.encode()).hexdigest()}.png")
-
-        # Si ya la tenemos cacheada, cargarla
-        if os.path.exists(cache_path):
-            try:
-                img = Image.open(cache_path).convert("RGBA")
-                img = img.resize((icon_size, icon_size), Image.LANCZOS)
-                images[name] = img
-                continue
-            except Exception:
-                pass
-
-        # Intentar descargar
-        downloaded = False
-
-        # 1st try: ui-avatars.com — colored text avatar with character initials
-        if not downloaded:
-            try:
-                hue = char.get("hue", 0.5)
-                r_c, g_c, b_c = [int(c * 255)
-                                  for c in colorsys.hsv_to_rgb(hue, 0.75, 0.85)]
-                hex_bg = f"{r_c:02x}{g_c:02x}{b_c:02x}"
-                ua_url = (
-                    f"https://ui-avatars.com/api/?name={quote(name)}"
-                    f"&size={icon_size}&background={hex_bg}"
-                    f"&color=fff&bold=true&format=png"
-                )
-                resp = requests.get(ua_url, timeout=8,
-                                    headers={"User-Agent": "Mozilla/5.0"})
-                if resp.status_code == 200 and len(resp.content) > 200:
-                    img = Image.open(io.BytesIO(resp.content)).convert("RGBA")
-                    img = img.resize((icon_size, icon_size), Image.LANCZOS)
-                    img.save(cache_path)
-                    images[name] = img
-                    downloaded = True
-            except Exception:
-                pass
-
-        # 2nd try: robohash set1 (robots look better than set4 cats)
-        if not downloaded:
-            try:
-                url = (f"https://robohash.org/{quote(name)}"
-                       f"?size={icon_size}x{icon_size}&set=set1")
-                resp = requests.get(url, timeout=5)
-                if resp.status_code == 200 and len(resp.content) > 500:
-                    img = Image.open(io.BytesIO(resp.content)).convert("RGBA")
-                    img = img.resize((icon_size, icon_size), Image.LANCZOS)
-                    img.save(cache_path)
-                    images[name] = img
-                    downloaded = True
-            except Exception:
-                pass
-
-        if not downloaded:
-            # Fallback: generar icono con símbolo
-            images[name] = _generate_fallback_icon(char, icon_size)
-
-        if (i + 1) % 20 == 0:
-            print(f"   {i + 1}/{len(characters)} procesados...")
-
-    print(f"[OK] {len(images)} imágenes de personajes listas.")
-    return images
-
-
-def _generate_fallback_icon(char: Dict, size: int) -> Image.Image:
-    """Genera un icono circular con el símbolo del personaje."""
-    hue = char.get("hue", random.random())
-    r, g, b = [int(c * 255) for c in colorsys.hsv_to_rgb(hue, 0.8, 0.9)]
-    img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img)
-    # Círculo de fondo
-    draw.ellipse([2, 2, size - 3, size - 3], fill=(r, g, b, 230))
-    draw.ellipse([2, 2, size - 3, size - 3], outline=(255, 255, 255, 200), width=2)
-    # Símbolo centrado
-    font_size = max(8, size // 3)
-    font = ImageFont.load_default()
+def _get_font(size: int):
+    """Load the best available bold font at the given size."""
     for path in [
         "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
         "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
     ]:
         if os.path.exists(path):
             try:
-                font = ImageFont.truetype(path, font_size)
-                break
+                return ImageFont.truetype(path, size)
             except Exception:
                 continue
-    text = char.get("symbol", "?")
+    return ImageFont.load_default()
+
+
+def _draw_text_centered(draw: ImageDraw.Draw, text: str, font,
+                        cx: int, cy: int, fill, outline=(0, 0, 0)):
+    """Draw text centered at (cx, cy) with a 1-px outline."""
     bbox = draw.textbbox((0, 0), text, font=font)
     tw, th = bbox[2] - bbox[0], bbox[3] - bbox[1]
-    draw.text(((size - tw) // 2, (size - th) // 2 - 1), text,
-              font=font, fill=(255, 255, 255, 255))
+    x, y = cx - tw // 2, cy - th // 2
+    for dx in (-1, 0, 1):
+        for dy in (-1, 0, 1):
+            if dx or dy:
+                draw.text((x + dx, y + dy), text, font=font, fill=outline)
+    draw.text((x, y), text, font=font, fill=fill)
+
+
+def _hsv(h: float, s: float, v: float, a: int = 255) -> Tuple[int, int, int, int]:
+    r, g, b = colorsys.hsv_to_rgb(h % 1.0, s, v)
+    return (int(r * 255), int(g * 255), int(b * 255), a)
+
+
+# ── Avatar style generators ──────────────────────────────────────────────────
+
+def _avatar_silhouette(rng: random.Random, size: int) -> Image.Image:
+    """Instagram-style 'no photo' silhouette on coloured background."""
+    h = rng.random()
+    bg = _hsv(h, 0.6, 0.75)
+    img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    draw.ellipse([0, 0, size - 1, size - 1], fill=bg)
+    # Head
+    hc = size // 2
+    hr = int(size * 0.20)
+    head_col = _hsv(h, 0.3, 0.95)
+    draw.ellipse([hc - hr, int(size * 0.18), hc + hr, int(size * 0.18) + hr * 2],
+                 fill=head_col)
+    # Shoulders
+    sw = int(size * 0.42)
+    sh = int(size * 0.28)
+    sy = int(size * 0.58)
+    draw.ellipse([hc - sw, sy, hc + sw, sy + sh * 2], fill=head_col)
     return img
 
 
-print("✅ Image downloader ready.")
+def _avatar_animal_face(rng: random.Random, size: int) -> Image.Image:
+    """Simple cartoon animal face (goat/cat/frog/dog/etc.)."""
+    animal = rng.choice(["goat", "cat", "frog", "dog", "penguin", "shark", "monkey"])
+    h = {"goat": 0.12, "cat": 0.05, "frog": 0.33, "dog": 0.08,
+         "penguin": 0.60, "shark": 0.55, "monkey": 0.07}[animal]
+    bg = _hsv(h, 0.55, 0.85)
+    face = _hsv(h, 0.35, 0.95)
+    eye_col = (30, 30, 30, 255)
+    img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    draw.ellipse([0, 0, size - 1, size - 1], fill=bg)
+    m = size // 2
+    # Face circle
+    fr = int(size * 0.36)
+    draw.ellipse([m - fr, m - fr, m + fr, m + fr], fill=face)
+    # Eyes
+    eo = int(size * 0.12)
+    er = int(size * 0.06)
+    draw.ellipse([m - eo - er, m - eo - er, m - eo + er, m - eo + er], fill=eye_col)
+    draw.ellipse([m + eo - er, m - eo - er, m + eo + er, m - eo + er], fill=eye_col)
+    # Smile arc
+    draw.arc([m - int(size * 0.14), m, m + int(size * 0.14), m + int(size * 0.16)],
+             start=10, end=170, fill=(80, 40, 10, 220), width=max(2, size // 18))
+    # Animal-specific ears
+    if animal in ("cat", "dog", "goat", "monkey"):
+        ear_r = int(size * 0.12)
+        draw.ellipse([m - fr - ear_r // 2, m - fr - ear_r,
+                      m - fr + ear_r, m - fr + ear_r // 2], fill=face)
+        draw.ellipse([m + fr - ear_r, m - fr - ear_r,
+                      m + fr + ear_r // 2, m - fr + ear_r // 2], fill=face)
+    return img
+
+
+_BRAINROT_WORDS = [
+    "SIGMA", "RIZZ", "SKIBIDI", "OHIO", "GYATT", "NPC", "SLAY", "BUSSIN",
+    "RATIO", "CAP", "W", "L", "GOAT", "BASED", "COPE", "YEET", "BRUH",
+    "SUS", "VIBE", "BLUD", "TWIN", "ATE", "SNATCHED", "GLAZING", "DELULU",
+    "MEWING", "SIGMA", "RIZZ", "SKIBIDI", "DOWN BAD", "COOKED",
+    "NO CAP", "IRL", "GG", "EZ", "OP", "AFK", "MVP", "GOATED",
+    "RENT FREE", "CORE", "MAIN", "PLOT", "TOXIC", "CARRY",
+]
+
+
+def _avatar_text_badge(rng: random.Random, size: int) -> Image.Image:
+    """Circular badge with a brainrot word."""
+    word = rng.choice(_BRAINROT_WORDS)
+    h = rng.random()
+    bg = _hsv(h, 0.80, 0.90)
+    ring = _hsv((h + 0.5) % 1.0, 0.9, 1.0)
+    img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    draw.ellipse([0, 0, size - 1, size - 1], fill=bg)
+    draw.ellipse([2, 2, size - 3, size - 3], outline=ring, width=max(2, size // 16))
+    # Choose font size to fit
+    for fs in range(size // 2, 6, -2):
+        font = _get_font(fs)
+        bbox = draw.textbbox((0, 0), word, font=font)
+        if bbox[2] - bbox[0] < size * 0.82:
+            break
+    _draw_text_centered(draw, word, font, size // 2, size // 2,
+                        fill=(255, 255, 255, 255), outline=(0, 0, 0, 180))
+    return img
+
+
+def _avatar_abstract_face(rng: random.Random, size: int) -> Image.Image:
+    """Geometric abstract face with spiral eyes or zigzag mouth."""
+    h = rng.random()
+    bg = _hsv(h, 0.70, 0.80)
+    img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    draw.ellipse([0, 0, size - 1, size - 1], fill=bg)
+    m = size // 2
+    # Spiral eyes — concentric arcs
+    for eye_cx in (m - size // 6, m + size // 6):
+        for r_s in range(size // 8, 0, -3):
+            col = _hsv((h + r_s * 0.1) % 1.0, 0.9, 0.95)
+            draw.arc([eye_cx - r_s, m - size // 5 - r_s,
+                      eye_cx + r_s, m - size // 5 + r_s],
+                     start=0, end=300, fill=col, width=2)
+    # Zigzag mouth
+    pts = []
+    steps = 6
+    mx0 = m - size // 4
+    mx1 = m + size // 4
+    my = m + size // 8
+    for i in range(steps + 1):
+        xz = mx0 + (mx1 - mx0) * i // steps
+        yz = my + (size // 16 if i % 2 == 0 else -size // 16)
+        pts.append((xz, yz))
+    if len(pts) >= 2:
+        draw.line(pts, fill=(255, 255, 255, 220), width=max(2, size // 18))
+    return img
+
+
+def _avatar_emoji_face(rng: random.Random, size: int) -> Image.Image:
+    """Emoji-style face drawn with circles and arcs."""
+    style = rng.choice(["happy", "angry", "cool", "skull", "uwu", "xd", "zzz"])
+    h = {"happy": 0.14, "angry": 0.00, "cool": 0.58, "skull": 0.00,
+         "uwu": 0.85, "xd": 0.10, "zzz": 0.60}[style]
+    sat = 0.0 if style == "skull" else 0.75
+    bg = _hsv(h, sat, 0.90 if style != "skull" else 0.15)
+    img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    draw.ellipse([0, 0, size - 1, size - 1], fill=bg)
+    m = size // 2
+    eo = int(size * 0.13)
+    er = int(size * 0.07)
+    eye_y = m - int(size * 0.10)
+    eye_col = (255, 255, 255, 255) if style == "skull" else (30, 30, 30, 255)
+
+    if style == "skull":
+        # X eyes
+        for ex in (m - eo, m + eo):
+            draw.line([(ex - er, eye_y - er), (ex + er, eye_y + er)],
+                      fill=(255, 80, 80, 255), width=max(2, size // 16))
+            draw.line([(ex + er, eye_y - er), (ex - er, eye_y + er)],
+                      fill=(255, 80, 80, 255), width=max(2, size // 16))
+    elif style == "cool":
+        # Sunglasses
+        draw.rectangle([m - eo - er, eye_y - er, m - eo + er, eye_y + er],
+                       fill=(20, 20, 20, 230))
+        draw.rectangle([m + eo - er, eye_y - er, m + eo + er, eye_y + er],
+                       fill=(20, 20, 20, 230))
+        draw.line([(m - eo + er, eye_y), (m + eo - er, eye_y)],
+                  fill=(20, 20, 20, 230), width=max(2, size // 20))
+    elif style == "xd":
+        # > < eyes
+        font_e = _get_font(max(8, size // 4))
+        _draw_text_centered(draw, ">", font_e, m - eo, eye_y, (30, 30, 30, 255))
+        _draw_text_centered(draw, "<", font_e, m + eo, eye_y, (30, 30, 30, 255))
+    else:
+        draw.ellipse([m - eo - er, eye_y - er, m - eo + er, eye_y + er], fill=eye_col)
+        draw.ellipse([m + eo - er, eye_y - er, m + eo + er, eye_y + er], fill=eye_col)
+
+    # Mouth
+    mouth_y = m + int(size * 0.10)
+    mw = int(size * 0.22)
+    if style == "happy":
+        draw.arc([m - mw, mouth_y - mw // 2, m + mw, mouth_y + mw // 2],
+                 start=10, end=170, fill=(80, 40, 10, 220),
+                 width=max(2, size // 14))
+    elif style == "angry":
+        draw.arc([m - mw, mouth_y, m + mw, mouth_y + mw],
+                 start=190, end=350, fill=(180, 30, 10, 220),
+                 width=max(2, size // 14))
+    elif style == "uwu":
+        font_uw = _get_font(max(8, size // 4))
+        _draw_text_centered(draw, "uwu", font_uw, m, mouth_y + 4,
+                            (255, 180, 200, 255))
+    elif style == "zzz":
+        font_zz = _get_font(max(8, size // 5))
+        _draw_text_centered(draw, "ZZZ", font_zz, m, mouth_y,
+                            (200, 230, 255, 255))
+    else:
+        draw.line([(m - mw, mouth_y + mw // 4), (m + mw, mouth_y + mw // 4)],
+                  fill=(80, 40, 10, 220), width=max(2, size // 16))
+    return img
+
+
+def _avatar_pixel_art(rng: random.Random, size: int) -> Image.Image:
+    """Simple 8x8 pixel art character scaled up."""
+    h = rng.random()
+    bg = _hsv(h, 0.65, 0.80)
+    fc = _hsv((h + 0.5) % 1.0, 0.8, 0.95)
+    img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    draw.ellipse([0, 0, size - 1, size - 1], fill=bg)
+    grid = 8
+    cell = size // grid
+    # Simple smiley pixel pattern
+    smile_pixels = [
+        (2, 2), (5, 2),                # eyes
+        (1, 5), (2, 6), (3, 6), (4, 6), (5, 6), (6, 5),  # smile
+    ]
+    for px, py in smile_pixels:
+        x0, y0 = px * cell, py * cell
+        draw.rectangle([x0, y0, x0 + cell - 1, y0 + cell - 1], fill=fc)
+    # Random extra pixels
+    for _ in range(rng.randint(3, 8)):
+        px2, py2 = rng.randint(0, grid - 1), rng.randint(0, grid - 1)
+        if (px2, py2) not in smile_pixels:
+            x0, y0 = px2 * cell, py2 * cell
+            alt = _hsv((h + 0.3) % 1.0, 0.7, 0.9)
+            draw.rectangle([x0, y0, x0 + cell - 1, y0 + cell - 1], fill=alt)
+    return img
+
+
+def _avatar_gradient_orb(rng: random.Random, size: int) -> Image.Image:
+    """Colourful gradient orb with a letter/symbol."""
+    h1, h2 = rng.random(), rng.random()
+    img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    # Gradient via concentric ellipses
+    steps = size // 2
+    for i in range(steps, 0, -1):
+        t = i / steps
+        hh = h1 * t + h2 * (1.0 - t)
+        col = _hsv(hh, 0.8, 0.6 + 0.4 * t)
+        r_s = int(size / 2 * i / steps)
+        cx, cy = size // 2, size // 2
+        draw.ellipse([cx - r_s, cy - r_s, cx + r_s, cy + r_s], fill=col)
+    # Mask to circle
+    mask = Image.new("L", (size, size), 0)
+    ImageDraw.Draw(mask).ellipse([0, 0, size - 1, size - 1], fill=255)
+    img.putalpha(mask)
+    draw = ImageDraw.Draw(img)
+    # Symbol
+    sym = rng.choice(list("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#@$%!?*"))
+    font_s = _get_font(max(8, int(size * 0.45)))
+    _draw_text_centered(draw, sym, font_s, size // 2, size // 2,
+                        fill=(255, 255, 255, 255), outline=(0, 0, 0, 160))
+    return img
+
+
+def _avatar_meme_face(rng: random.Random, size: int) -> Image.Image:
+    """Simple ASCII meme face or trollface-style drawing."""
+    style = rng.choice(["troll", "smiley", "xd_text", "dot_face", "derp"])
+    h = rng.random()
+    bg = _hsv(h, 0.55, 0.85)
+    img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    draw.ellipse([0, 0, size - 1, size - 1], fill=bg)
+    m = size // 2
+    faces = {
+        "troll": ":)",
+        "smiley": ":D",
+        "xd_text": "XD",
+        "dot_face": "._.",
+        "derp": "B)",
+    }
+    face_str = faces[style]
+    fs = max(8, int(size * 0.38))
+    font_f = _get_font(fs)
+    _draw_text_centered(draw, face_str, font_f, m, m,
+                        fill=(30, 30, 30, 255), outline=(255, 255, 255, 120))
+    return img
+
+
+def _avatar_random_object(rng: random.Random, size: int) -> Image.Image:
+    """Draw a simple random object: toilet, crown, star, lightning, etc."""
+    obj = rng.choice(["toilet", "crown", "star", "diamond", "lightning",
+                      "camera", "tv", "speaker"])
+    h = rng.random()
+    bg = _hsv(h, 0.65, 0.80)
+    oc = _hsv((h + 0.5) % 1.0, 0.85, 0.95)
+    img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    draw.ellipse([0, 0, size - 1, size - 1], fill=bg)
+    m = size // 2
+    p = int(size * 0.25)  # padding inside circle
+
+    if obj == "star":
+        pts = []
+        for i in range(10):
+            angle = math.pi / 2 + i * 2 * math.pi / 10
+            r_s = (size // 2 - p) if i % 2 == 0 else (size // 4 - p // 2)
+            pts.append((m + int(r_s * math.cos(angle)),
+                        m + int(r_s * math.sin(angle))))
+        draw.polygon(pts, fill=oc)
+    elif obj == "diamond":
+        d = size // 2 - p
+        draw.polygon([(m, p), (m + d, m), (m, size - p), (m - d, m)], fill=oc)
+    elif obj == "lightning":
+        lpts = [(m - p, m - p), (m + p // 2, m),
+                (m, m), (m + p, m + p),
+                (m - p // 2, m + p // 4)]
+        draw.polygon(lpts, fill=oc)
+    elif obj == "crown":
+        base_y = m + p
+        draw.polygon([(m - p * 2, base_y), (m - p * 2, m),
+                      (m - p, m - p * 2), (m, m),
+                      (m + p, m - p * 2), (m + p * 2, m),
+                      (m + p * 2, base_y)], fill=oc)
+    elif obj == "tv":
+        draw.rounded_rectangle([m - p, m - p, m + p, m + p], radius=4, fill=oc)
+        draw.rounded_rectangle([m - p + 4, m - p + 4, m + p - 4, m + p - 4],
+                               radius=2, fill=bg)
+    elif obj == "toilet":
+        draw.ellipse([m - p, m, m + p, size - p // 2], fill=oc)
+        draw.rectangle([m - p // 2, m - p, m + p // 2, m + p // 4], fill=oc)
+    elif obj == "camera":
+        draw.rounded_rectangle([m - p, m - p // 2, m + p, m + p], radius=4, fill=oc)
+        draw.ellipse([m - p // 2, m - p // 4, m + p // 2, m + p // 4 + p // 2],
+                     fill=bg)
+        draw.ellipse([m - p // 4, m, m + p // 4, m + p // 2], fill=oc)
+    else:  # speaker
+        draw.rectangle([m - p // 2, m - p // 2, m, m + p // 2], fill=oc)
+        draw.polygon([(m, m - p), (m + p, m - p * 2), (m + p, m + p * 2),
+                      (m, m + p)], fill=oc)
+    return img
+
+
+def _avatar_color_pattern(rng: random.Random, size: int) -> Image.Image:
+    """Checkerboard, stripes, polka dots, or bullseye pattern."""
+    pattern = rng.choice(["checker", "stripes", "polka", "bullseye"])
+    h1, h2 = rng.random(), (rng.random() + 0.4) % 1.0
+    c1 = _hsv(h1, 0.75, 0.85)
+    c2 = _hsv(h2, 0.75, 0.85)
+    img = Image.new("RGBA", (size, size), c1)
+    draw = ImageDraw.Draw(img)
+
+    if pattern == "checker":
+        cell = size // 6
+        for i in range(7):
+            for j in range(7):
+                if (i + j) % 2 == 0:
+                    draw.rectangle([i * cell, j * cell,
+                                    (i + 1) * cell, (j + 1) * cell], fill=c2)
+    elif pattern == "stripes":
+        stripe_w = size // 7
+        for i in range(0, size, stripe_w * 2):
+            draw.rectangle([i, 0, i + stripe_w, size], fill=c2)
+    elif pattern == "polka":
+        dot_r = size // 9
+        spacing = size // 4
+        for ix in range(0, size, spacing):
+            for iy in range(0, size, spacing):
+                draw.ellipse([ix, iy, ix + dot_r * 2, iy + dot_r * 2], fill=c2)
+    else:  # bullseye
+        for r_b in range(size // 2, 0, -size // 8):
+            col = c1 if (r_b // (size // 8)) % 2 == 0 else c2
+            m = size // 2
+            draw.ellipse([m - r_b, m - r_b, m + r_b, m + r_b], fill=col)
+
+    # Clip to circle
+    mask = Image.new("L", (size, size), 0)
+    ImageDraw.Draw(mask).ellipse([0, 0, size - 1, size - 1], fill=255)
+    img.putalpha(mask)
+    return img
+
+
+# ── Master avatar generator ──────────────────────────────────────────────────
+
+_AVATAR_STYLES = [
+    _avatar_silhouette,
+    _avatar_animal_face,
+    _avatar_text_badge,
+    _avatar_abstract_face,
+    _avatar_emoji_face,
+    _avatar_pixel_art,
+    _avatar_gradient_orb,
+    _avatar_meme_face,
+    _avatar_random_object,
+    _avatar_color_pattern,
+]
+
+
+def generate_avatar_pool(count: int = 250, size: int = 96,
+                         seed: int = 42) -> List[Image.Image]:
+    """Generate `count` unique avatar images using only Pillow.
+    Uses a seeded RNG so results are reproducible."""
+    rng = random.Random(seed)
+    avatars: List[Image.Image] = []
+    for i in range(count):
+        style_fn = _AVATAR_STYLES[i % len(_AVATAR_STYLES)]
+        try:
+            av = style_fn(rng, size)
+            if av.mode != "RGBA":
+                av = av.convert("RGBA")
+            avatars.append(av)
+        except Exception:
+            # Fallback: simple coloured circle
+            av = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+            dr = ImageDraw.Draw(av)
+            col = _hsv(rng.random(), 0.7, 0.85)
+            dr.ellipse([0, 0, size - 1, size - 1], fill=col)
+            avatars.append(av)
+    return avatars
+
+
+def generate_character_images(names: List[str], size: int = 96,
+                               seed: int = 42) -> Dict[str, Image.Image]:
+    """Generate one unique avatar per name from a seeded pool."""
+    pool = generate_avatar_pool(max(len(names), 250), size, seed)
+    return {name: pool[i % len(pool)] for i, name in enumerate(names)}
+
+
+print("[OK] Pure-code avatar generator ready.")
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -937,14 +1119,16 @@ def _ch_death_wall(balls, arena, hazards, rng, config, **kw):
 @_register("SHOCKWAVE BLAST", "[BOOM]", "shockwave")
 def _ch_shockwave(balls, arena, hazards, rng, config, **kw):
     ax1, ay1, ax2, ay2 = arena
-    thick = rng.uniform(10, 18)
+    thick = min(rng.uniform(10, 18), 18)
+    # Cap max_radius to 40% of the smaller arena dimension to avoid killing everyone
+    arena_min = min(ax2 - ax1, ay2 - ay1)
     hazards.shockwaves.append(Shockwave(
         cx=rng.uniform(ax1 + 50, ax2 - 50),
         cy=rng.uniform(ay1 + 50, ay2 - 50),
         speed=rng.uniform(2.5, 5.0),
-        max_radius=min(ax2 - ax1, ay2 - ay1) * rng.uniform(0.5, 0.8),
+        max_radius=arena_min * rng.uniform(0.30, 0.40),
         thickness=thick,
-        kill_thickness=thick,  # equal to visual thickness
+        kill_thickness=min(thick, 18),
         color=(255, 255, rng.randint(50, 200)),
     ))
 
@@ -1208,10 +1392,12 @@ def _ch_thanos(balls, arena, hazards, rng, config, **kw):
     una shockwave visible primero."""
     ax1, ay1, ax2, ay2 = arena
     cx, cy = (ax1 + ax2) / 2, (ay1 + ay2) / 2
+    # Cap to 40% of the smaller dimension to avoid covering the entire arena
+    arena_min = min(ax2 - ax1, ay2 - ay1)
     hazards.shockwaves.append(Shockwave(
         cx=cx, cy=cy, speed=6.0,
-                max_radius=max(ax2 - ax1, ay2 - ay1) * 0.7,
-        thickness=20, kill_thickness=20,  # equal, not 30
+        max_radius=arena_min * 0.40,
+        thickness=18, kill_thickness=18,
         color=(200, 100, 255),
     ))
 
@@ -2547,18 +2733,21 @@ class BallBattleRoyale:
         print(f"  Duration: {config.duration}s | FPS: {fps} | Frames: {total_frames}")
         print(f"{'=' * 60}\n")
 
-        # ── Download character images ──
-        char_pool = list(BRAINROT_CHARACTERS)
-        self.rng.shuffle(char_pool)
-        while len(char_pool) < config.num_balls:
-            extra = list(BRAINROT_CHARACTERS)
+        # ── Generate avatar images and assign names (no repeats per game) ──
+        name_pool = list(BRAINROT_NAMES)
+        self.rng.shuffle(name_pool)
+        # Ensure we have enough unique names (pad with duplicates only if needed)
+        while len(name_pool) < config.num_balls:
+            extra = list(BRAINROT_NAMES)
             self.rng.shuffle(extra)
-            char_pool.extend(extra)
-        assigned_chars = char_pool[:config.num_balls]
+            name_pool.extend(extra)
+        assigned_names = name_pool[:config.num_balls]
+        assigned_chars = [{"name": n} for n in assigned_names]
 
-        all_used_chars = list({c["name"]: c for c in assigned_chars}.values())
-        character_images = download_character_images(
-            all_used_chars, config.image_cache_dir, icon_size=96)
+        print("[*] Generating avatar images...")
+        character_images = generate_character_images(
+            assigned_names, size=96, seed=hash(config.seed) & 0xFFFFFF)
+        print(f"[OK] {len(character_images)} avatars generated.")
 
         # ── Select challenges ──
         available_categories: Set[str] = set()
